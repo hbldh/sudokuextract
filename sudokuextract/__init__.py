@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Release data for the skboost project."""
+"""Release data for the SudokuExtract project."""
 
 # -----------------------------------------------------------------------------
 #  Copyright (c) 2015, Nedomkull Mathematical Modeling AB.
@@ -41,10 +41,10 @@ classifiers = [
 # release.  'dev' as a _version_extra string means this is a development
 # version.
 _version_major = 0
-_version_minor = 1
+_version_minor = 3
 _version_patch = 0
-_version_extra = '.dev1'
-# _version_extra = 'a4'
+#_version_extra = '.dev1'
+_version_extra = 'a1'
 # _version_extra = ''  # Uncomment this for full releases
 
 # Construct full version string from these.

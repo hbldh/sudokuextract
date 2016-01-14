@@ -1,5 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
 
+train-images-idx3-ubyte.gz
+train-labels-idx1-ubyte.gz
+
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/

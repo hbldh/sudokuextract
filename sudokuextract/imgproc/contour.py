@@ -8,7 +8,7 @@
     :platform: Unix, Windows
     :synopsis:
 
-.. moduleauthor:: hbldh <henrik.blidh@swedwise.com>
+.. moduleauthor:: hbldh <henrik.blidh@nedomkull.com>
 
 Created on 2016-01-14, 09:49
 
@@ -20,12 +20,12 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 from operator import attrgetter
-from skimage.filters import threshold_adaptive
 from skimage import measure
 
 
 def get_contours(img, contour_param=0.8):
     # Find contours
     contours = measure.find_contours(img, contour_param)
+    # Sort with largest first.
     contours.sort(key=attrgetter('size'), reverse=True)
     return contours

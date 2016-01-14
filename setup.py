@@ -3,12 +3,7 @@
 :mod:`setup.py`
 ===============
 
-.. module:: setup
-   :platform: Unix, Windows
-   :synopsis: The Python Packaging setup file for MilBoost.
-
 .. moduleauthor:: hbldh <henrik.blidh@nedomkull.com>
-
 Created on 2015-11-05
 
 """
@@ -45,23 +40,21 @@ setup(
     classifiers=sudokuextract.classifiers,
     packages=find_packages(exclude=('tests', 'docs')),
     package_data={
-        'sudokuextract.data': ['*', ],
+        'sudokuextract.data': ['*.gz', '*.pklz'],
     },
     install_requires=[
-        'numpy>=1.10.4',
+        'numpy>=1.10.2',
         'scipy>=0.16.1',
         'scikit-image>=0.11.3',
-        'matplotlib>=1.5.1',
+        'scikit-learn>=0.17'
+        'matplotlib>=1.5.0',
         'pillow>=3.1.0'
     ],
     dependency_links=[],
-    ext_package='sudokuextract.stumps.ext',
-    ext_modules=[
-        Extension('classifiers',
-                  sources=['sudokuextract/stumps/ext/classifiers_src/classifiers.c'],
-                  include_dirs=[numpy.get_include(),
-                                'sudokuextract/stumps/ext/classifiers_src/'])
-    ],
-    entry_points={}
+    entry_points={
+        'console_scripts': [
+            'parse-sudoku = sudokuextract.extract:main'
+        ]
+    },
 )
 

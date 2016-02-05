@@ -124,7 +124,8 @@ def get_default_sudokuextract_classifier():
         classifier = KNeighborsClassifier()
         classifier = fit_sudokuextract_classifier(classifier)
         f = gzip.open(fname, 'wb')
-        pickle.dump(classifier, f)
+        s = pickle.dumps(classifier)
+        f.write(s.decode('ascii'))
         f.close()
 
     return classifier

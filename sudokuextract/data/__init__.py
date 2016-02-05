@@ -78,13 +78,15 @@ def get_mnist_data(flat_images=False):
 def _mnist_data(flat_images=False):
     fname = resource_filename('sudokuextract.data', "train-images-idx3-ubyte.gz")
     if resource_exists('sudokuextract.data', "train-images-idx3-ubyte.gz"):
-        with gzip.GzipFile(fname, mode='rb') as f:
-            data = f.read()
+        f = gzip.open(fname, mode='rb')
+        data = f.read()
+        f.close()
     else:
         sio = StringIO(urlopen(_url_to_mnist_train_data).read())
         sio.seek(0)
-        with gzip.GzipFile(fileobj=sio, mode='rb') as f:
-            data = f.read()
+        f = gzip.GzipFile(fileobj=sio, mode='rb')
+        data = f.read()
+        f.close()
         try:
             sio.seek(0)
             with open(fname, 'wb') as f:
@@ -98,13 +100,15 @@ def _mnist_data(flat_images=False):
 def _mnist_labels():
     fname = resource_filename('sudokuextract.data', "train-labels-idx3-ubyte.gz")
     if resource_exists('sudokuextract.data', "train-labels-idx3-ubyte.gz"):
-        with gzip.GzipFile(fname, mode='rb') as f:
-            data = f.read()
+        f = gzip.open(fname, mode='rb')
+        data = f.read()
+        f.close()
     else:
         sio = StringIO(urlopen(_url_to_mnist_train_labels).read())
         sio.seek(0)
-        with gzip.GzipFile(fileobj=sio, mode='rb') as f:
-            data = f.read()
+        f = gzip.GzipFile(fileobj=sio, mode='rb')
+        data = f.read()
+        f.close()
         try:
             sio.seek(0)
             with open(fname, 'wb') as f:
@@ -122,8 +126,9 @@ def get_sudokuextract_data(flat_images=False):
 def _sudokuextract_data(flat_images=False):
     fname = resource_filename('sudokuextract.data', "se-train-data.gz")
     if resource_exists('sudokuextract.data', "se-train-data.gz"):
-        with gzip.GzipFile(fname, mode='rb') as f:
-            data = f.read()
+        f = gzip.open(fname, mode='rb')
+        data = f.read()
+        f.close()
     else:
         raise IOError("SudokuExtract Training data file was not present!")
 
@@ -133,8 +138,9 @@ def _sudokuextract_data(flat_images=False):
 def _sudokuextract_labels():
     fname = resource_filename('sudokuextract.data', "se-train-labels.gz")
     if resource_exists('sudokuextract.data', "se-train-labels.gz"):
-        with gzip.GzipFile(fname, mode='rb') as f:
-            data = f.read()
+        f = gzip.open(fname, mode='rb')
+        data = f.read()
+        f.close()
     else:
         raise IOError("SudokuExtract Training labels file was not present!")
 

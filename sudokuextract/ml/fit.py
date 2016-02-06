@@ -14,6 +14,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
+import sys
 import itertools
 from pkg_resources import resource_filename, resource_exists
 try:
@@ -115,17 +116,24 @@ def get_default_mnist_classifier():
 
 
 def get_default_sudokuextract_classifier():
-    fname = resource_filename('sudokuextract.data', "sudokuextract_classifier.pklz")
-    if resource_exists('sudokuextract.data', "sudokuextract_classifier.pklz"):
-        f = gzip.open(fname, 'rb')
+
+    if sys.version_info[0] == 2:
+        file_name = "sudokuextract_classifier_py2.pklz"
+        protocol = 2
+    else:
+        file_name = "sudokuextract_classifier_py3.pklz"
+        protocol = 3
+
+    file_path = resource_filename('sudokuextract.data', file_name)
+    if resource_exists('sudokuextract.data', file_name):
+        f = gzip.open(file_path, 'rb')
         classifier = pickle.load(f)
         f.close()
     else:
         classifier = KNeighborsClassifier()
         classifier = fit_sudokuextract_classifier(classifier)
-        f = gzip.open(fname, 'wb')
-        s = pickle.dumps(classifier)
-        f.write(s.decode('ascii'))
+        f = gzip.open(file_path, 'wb')
+        pickle.dump(classifier, f, protocol=protocol)
         f.close()
 
     return classifier

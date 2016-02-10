@@ -41,10 +41,7 @@ def get_lines(image):
 
 def get_intersections(lines, image):
     intersections = []
-    #import matplotlib.pyplot as plt
-    #plt.imshow(image, plt.cm.gray)
     for i, ((x0, x1), line_1) in enumerate(lines):
-        #plt.plot((x0, x1), (line_1[0] * x0 + line_1[1], line_1[0] * x1 + line_1[1]), 'r')
         for j, (_, line_2) in enumerate(lines):
             if i == j:
                 continue
@@ -63,11 +60,6 @@ def get_intersections(lines, image):
                 continue
 
             intersections.append((x, y))
-    # plt.xlim((x0, x1))
-    # plt.ylim((image.shape[0], 0))
-    # for p in intersections:
-    #     plt.plot(p[0], p[1], 'g+')
-    # plt.show()
     return intersections
 
 
@@ -77,14 +69,5 @@ def get_extremes(points, image):
     top_right = sorted(points, key=lambda x: np.linalg.norm(np.array(x) - [image.shape[1], 0]))[0]
     bottom_left = sorted(points, key=lambda x: np.linalg.norm(np.array(x) - [0, image.shape[0]]))[0]
     bottom_right = sorted(points, key=lambda x: np.linalg.norm(np.array(x) - [image.shape[1], image.shape[0]]))[0]
-
-    # import matplotlib.pyplot as plt
-    # plt.imshow(image, plt.cm.gray)
-    # plt.plot(top_left[0], top_left[1], 'ro')
-    # plt.plot(top_right[0], top_right[1], 'ro')
-    # plt.plot(bottom_left[0], bottom_left[1], 'ro')
-    # plt.plot(bottom_right[0], bottom_right[1], 'ro')
-    #
-    # plt.show()
 
     return top_left, top_right, bottom_left, bottom_right

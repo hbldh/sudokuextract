@@ -43,11 +43,10 @@ setup(
         'sudokuextract.data': ['*.gz', '*.pklz'],
     },
     install_requires=[
-        'numpy>=1.10.2',
-        'scipy>=0.16.1',
+        'numpy>=1.9.2',
+        'scipy>=0.15.1',
         'scikit-image>=0.11.3',
         'scikit-learn>=0.17'
-        'matplotlib>=1.5.0',
         'pillow>=3.1.0'
     ],
     dependency_links=[],

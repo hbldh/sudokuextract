@@ -26,8 +26,6 @@ import numpy as np
 from skimage.transform import resize
 from PIL import Image
 
-import matplotlib.pyplot as plt
-
 from sudokuextract.imgproc.binary import to_binary
 from sudokuextract.extract import extraction_iterator
 
@@ -147,7 +145,14 @@ def _sudokuextract_labels():
     return _load_labels_file(data, 2049)
 
 
-def create_data_set_from_images(path_to_data_dir, training_set=True, force=False):
+def create_data_set_from_images(path_to_data_dir, training_set=True):
+
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        print("This method requires matplotlib installed...")
+        return
+
     images = []
     labels = []
     path_to_data_dir = os.path.abspath(os.path.expanduser(path_to_data_dir))

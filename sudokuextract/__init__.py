@@ -42,9 +42,9 @@ classifiers = [
 # version.
 _version_major = 0
 _version_minor = 3
-_version_patch = 0
-#_version_extra = '.dev1'
-_version_extra = 'b1'
+_version_patch = 1
+_version_extra = '.dev1'
+#_version_extra = 'b1'
 # _version_extra = ''  # Uncomment this for full releases
 
 # Construct full version string from these.

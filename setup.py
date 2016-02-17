@@ -13,31 +13,39 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
-from setuptools import setup, find_packages, Extension
+import sys
+from codecs import open
+from setuptools import setup, find_packages
 
-import numpy
 import sudokuextract
 
 basedir = os.path.dirname(os.path.abspath(__file__))
 
-with open('README.md') as f:
-    LONG_DESCRIPTION = f.read()
+if sys.argv[-1] == 'publish':
+    os.system('python setup.py register')
+    os.system('python setup.py sdist upload')
+    os.system('python setup.py bdist_wheel upload --universal')
+    sys.exit()
+
+
+def read(f):
+    return open(f, encoding='utf-8').read()
+
 
 setup(
     name='sudokuextract',
     version=sudokuextract.__version__,
-    author=sudokuextract.author,
-    author_email=sudokuextract.author_email,
-    maintainer=sudokuextract.maintainer,
-    maintainer_email=sudokuextract.maintainer_email,
-    url=sudokuextract.url,
-    download_url=sudokuextract.download_url,
-    description=sudokuextract.description,
-    long_description=LONG_DESCRIPTION,
-    license=sudokuextract.license,
-    platforms=sudokuextract.platforms,
-    keywords=sudokuextract.keywords,
-    classifiers=sudokuextract.classifiers,
+    author=sudokuextract.__author__,
+    author_email=sudokuextract.__author_email__,
+    maintainer=sudokuextract.__maintainer__,
+    maintainer_email=sudokuextract.__maintainer_email__,
+    url=sudokuextract.__url__,
+    description=sudokuextract.__description__,
+    long_description=read('README.rst') + '\n\n' + read('HISTORY.rst'),
+    license=sudokuextract.__license__,
+    platforms=sudokuextract.__platforms__,
+    keywords=sudokuextract._keywords__,
+    classifiers=sudokuextract.__classifiers__,
     packages=find_packages(exclude=('tests', 'docs')),
     package_data={
         'sudokuextract.data': ['*.gz', '*.pklz'],
@@ -46,9 +54,11 @@ setup(
         'numpy>=1.9.2',
         'scipy>=0.15.1',
         'scikit-image>=0.11.3',
-        'scikit-learn>=0.17'
-        'pillow>=3.1.0'
+        'scikit-learn>=0.17',
+        'pillow>=3.1.0',
+        'pyefd>=0.1.0'
     ],
+    test_suite="tests",
     dependency_links=[],
     entry_points={
         'console_scripts': [

@@ -49,10 +49,49 @@ def get_n_largest_blobs(image, n=5):
         # skip small images
         if region.area < int(np.prod(size) * 0.05):
             continue
-        blobs.append((region.filled_area, region.bbox))
+        blobs.append((region.area, region.bbox))
 
     blobs.sort(key=itemgetter(0))
     return [img[b[0]:b[2], b[1]:b[3]] for sol, b in blobs[:n]]
+
+
+def get_extremes_of_n_largest_blobs(image, n=5):
+    original_shape = image.size
+    if max(image.size) < 2000:
+        size = (500, 500)
+        y_scale = original_shape[0] / 500
+        x_scale = original_shape[1] / 500
+    else:
+        size = (1000, 1000)
+        y_scale = original_shape[0] / 1000
+        x_scale = original_shape[1] / 1000
+
+    img = np.array(image.resize(size))
+    bimg = gaussian_filter(img, sigma=1.0)
+    bimg = threshold_adaptive(bimg, 20, offset=2/255)
+    bimg = -bimg
+    bimg = ndi.binary_fill_holes(bimg)
+    label_image = label(bimg, background=False)
+    label_image += 1
+    blobs = []
+    for region in regionprops(label_image):
+        # skip small images
+        if region.area < int(np.prod(size) * 0.05):
+            continue
+        coords = np.fliplr(region.coords)
+
+        top_left = sorted(coords, key=lambda x: np.linalg.norm(np.array(x)))[0]
+        top_right = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [img.shape[1], 0]))[0]
+        bottom_left = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [0, img.shape[0]]))[0]
+        bottom_right = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [img.shape[1], img.shape[0]]))[0]
+
+        blobs.append((region.filled_area, (top_left, top_right, bottom_left, bottom_right)))
+
+    blobs.sort(key=itemgetter(0))
+    output = []
+    for blob in blobs[:n]:
+        output.append([(int(x[0] * y_scale), int(x[1]*x_scale)) for x in blob[1]])
+    return output
 
 
 def blobify(images, flat_images=False):

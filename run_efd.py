@@ -56,7 +56,7 @@ the_image = Image.open(s)
 #classifier = fit.fit_sudokuextract_classifier(classifier)
 classifier = fit.get_default_sudokuextract_classifier()
 
-preds, sudoku = parse_sudoku(the_image, classifier)
+preds, sudoku, subimage = parse_sudoku(the_image, classifier)
 
 ax = plt.subplot2grid((9, 9+9), (0, 0), colspan=9, rowspan=9)
 ax.imshow(the_image, plt.cm.gray)

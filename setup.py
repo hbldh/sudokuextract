@@ -13,15 +13,24 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
-from setuptools import setup, find_packages, Extension
+import sys
+from codecs import open
+from setuptools import setup, find_packages
 
-import numpy
 import sudokuextract
 
 basedir = os.path.dirname(os.path.abspath(__file__))
 
-with open('README.md') as f:
-    LONG_DESCRIPTION = f.read()
+if sys.argv[-1] == 'publish':
+    os.system('python setup.py register')
+    os.system('python setup.py sdist upload')
+    os.system('python setup.py bdist_wheel upload --universal')
+    sys.exit()
+
+
+def read(f):
+    return open(f, encoding='utf-8').read()
+
 
 setup(
     name='sudokuextract',
@@ -31,9 +40,8 @@ setup(
     maintainer=sudokuextract.__maintainer__,
     maintainer_email=sudokuextract.__maintainer_email__,
     url=sudokuextract.__url__,
-    download_url=sudokuextract.download_url,
     description=sudokuextract.__description__,
-    long_description=LONG_DESCRIPTION,
+    long_description=read('README.rst'),
     license=sudokuextract.__license__,
     platforms=sudokuextract.__platforms__,
     keywords=sudokuextract._keywords__,
@@ -47,8 +55,10 @@ setup(
         'scipy>=0.15.1',
         'scikit-image>=0.11.3',
         'scikit-learn>=0.17',
-        'pillow>=3.1.0'
+        'pillow>=3.1.0',
+        'pyefd>=0.1.0'
     ],
+    test_suite="tests",
     dependency_links=[],
     entry_points={
         'console_scripts': [

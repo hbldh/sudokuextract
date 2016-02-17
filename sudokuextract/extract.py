@@ -73,29 +73,30 @@ def extraction_iterator(image, n=10):
         except:
             pass
         else:
-            yield sudoku
+            yield sudoku, warped_image
 
 
-def extraction_iterator(image, n=10):
+def extraction_iterator_2(image, n=10):
     img = image.convert('L')
     blobs = get_extremes_of_n_largest_blobs(img, n=n)
     for corner_points in blobs:
         try:
             warped_image = warp_image(corner_points, img)
-            sudoku = split_image_into_sudoku_pieces(to_binary_adaptive(warped_image))
+            bin_image = to_binary_adaptive(warped_image)
+            sudoku = split_image_into_sudoku_pieces(bin_image)
         except:
             pass
         else:
-            yield sudoku
+            yield sudoku, bin_image
 
 
 def parse_sudoku(image, classifier):
-    for sudoku in extraction_iterator_2(image):
+    for sudoku, subimage in extraction_iterator(image):
         pred_n_imgs = [[classify_efd_features(sudoku[k][kk], classifier) for kk in range(9)] for k in range(9)]
         preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
         imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
         if np.sum(preds > 0) >= 17:
-            return preds, imgs
+            return preds, imgs, subimage
     raise
 
 
@@ -125,7 +126,7 @@ def main():
         image = download_image(args.url)
 
     classifier = get_default_sudokuextract_classifier()
-    preds, images = parse_sudoku(image, classifier)
+    preds, images, subimage = parse_sudoku(image, classifier)
     sudoku_string = predictions_to_suduko_string(preds, args.oneliner)
 
     print(sudoku_string)

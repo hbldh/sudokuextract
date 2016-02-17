@@ -16,6 +16,8 @@ from __future__ import absolute_import
 
 import os
 import sys
+import unittest
+
 try:
     from urllib.request import urlopen
 except ImportError:
@@ -48,10 +50,9 @@ def _get_parsed_img(nbr=1):
     return parsed_img
 
 
-class TestEFDClassifier(object):
-    """
-    """
-    def __init__(self):
+class TestEFDClassifier(unittest.TestCase):
+    """Testing the SudokuExtract with default classifier."""
+    def setUp(self):
         self.classifier = get_default_sudokuextract_classifier()
 
     def _print_sudokus(self, parsed_sudoku, correct_sudoku):
@@ -134,9 +135,7 @@ class TestEFDClassifier(object):
         assert parsed_sudoku == solution
 
     def _process_an_image(self, image, correct_sudoku):
-        predictions, sudoku = parse_sudoku(image, self.classifier)
+        predictions, sudoku, subimage = parse_sudoku(image, self.classifier)
         parsed_sudoku = predictions_to_suduko_string(predictions)
         self._print_sudokus(parsed_sudoku, correct_sudoku)
         assert parsed_sudoku == correct_sudoku
-
-

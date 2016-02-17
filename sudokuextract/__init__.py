@@ -21,10 +21,7 @@ __classifiers__ = [
     'License :: OSI Approved :: MIT License',
     'Topic :: Software Development',
     'Topic :: Scientific/Engineering',
-    'Operating System :: Microsoft :: Windows',
-    'Operating System :: POSIX',
-    'Operating System :: Unix',
-    'Operating System :: MacOS',
+    'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 2',
     'Programming Language :: Python :: 2.6',
@@ -40,8 +37,8 @@ __classifiers__ = [
 # release.  'dev' as a _version_extra string means this is a development
 # version.
 _version_major = 0
-_version_minor = 3
-_version_patch = 1
+_version_minor = 4
+_version_patch = 0
 _version_extra = '.dev1'
 #_version_extra = 'b1'
 # _version_extra = ''  # Uncomment this for full releases

@@ -11,7 +11,7 @@ __maintainer__ = 'Henrik Blidh'
 __maintainer_email__ = 'henrik.blidh@nedomkull.com'
 __license__ = 'MIT'
 __description__ = "Library for extracting Sudokus from images using scikit-image"
-__url__ = 'https://bitbucket.org/nedomkull/sudokuextract'
+__url__ = 'https://github.com/hbldh/sudokuextract'
 __platforms__ = 'any'
 _keywords__ = ['Image Processing', 'Sudoku']
 __classifiers__ = [
@@ -39,9 +39,9 @@ __classifiers__ = [
 _version_major = 0
 _version_minor = 4
 _version_patch = 0
-_version_extra = '.dev1'
-#_version_extra = 'b1'
-# _version_extra = ''  # Uncomment this for full releases
+# _version_extra = '.dev1'
+# _version_extra = 'b1'
+_version_extra = ''  # Uncomment this for full releases
 
 # Construct full version string from these.
 _ver = [_version_major, _version_minor, _version_patch]

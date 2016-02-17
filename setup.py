@@ -41,7 +41,7 @@ setup(
     maintainer_email=sudokuextract.__maintainer_email__,
     url=sudokuextract.__url__,
     description=sudokuextract.__description__,
-    long_description=read('README.rst'),
+    long_description=read('README.rst') + '\n\n' + read('HISTORY.rst'),
     license=sudokuextract.__license__,
     platforms=sudokuextract.__platforms__,
     keywords=sudokuextract._keywords__,

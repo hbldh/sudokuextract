@@ -54,7 +54,6 @@ setup(
         'numpy>=1.9.2',
         'scipy>=0.15.1',
         'scikit-image>=0.11.3',
-        'scikit-learn>=0.17',
         'pillow>=3.1.0',
         'pyefd>=0.1.0'
     ],

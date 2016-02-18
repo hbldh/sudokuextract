@@ -24,7 +24,12 @@ except ImportError:
 import gzip
 
 import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
+try:
+    from sklearn.neighbors import KNeighborsClassifier
+    _use_sklearn = True
+except ImportError:
+    from sudokuextract.ml.knn import KNeighborsClassifier
+    _use_sklearn = False
 
 from sudokuextract.data import get_sudokuextract_data, get_mnist_data
 from sudokuextract.ml.features import extract_efd_features
@@ -117,11 +122,18 @@ def get_default_mnist_classifier():
 
 def get_default_sudokuextract_classifier():
 
+    if _use_sklearn:
+        return _load_sklearn_default_classifier()
+    else:
+        return _load_sudokuextract_default_classifier()
+
+
+def _load_sklearn_default_classifier():
     if sys.version_info[0] == 2:
-        file_name = "sudokuextract_classifier_py2.pklz"
+        file_name = "sklearn_classifier_py2.pklz"
         protocol = 2
     else:
-        file_name = "sudokuextract_classifier_py3.pklz"
+        file_name = "sklearn_classifier_py3.pklz"
         protocol = 3
 
     file_path = resource_filename('sudokuextract.data', file_name)
@@ -136,4 +148,28 @@ def get_default_sudokuextract_classifier():
         pickle.dump(classifier, f, protocol=protocol)
         f.close()
 
+    return classifier
+
+
+def _load_sudokuextract_default_classifier():
+    file_name = "sudokuextract_classifier.pklz"
+    protocol = 2
+
+    file_path = resource_filename('sudokuextract.data', file_name)
+    if resource_exists('sudokuextract.data', file_name):
+        f = gzip.open(file_path, 'rb')
+        classifier_json = pickle.load(f)
+        classifier = KNeighborsClassifier(classifier_json.get('n_neighbors'),
+                                          classifier_json.get('weights'),
+                                          classifier_json.get('metric'),
+                                          classifier_json.get('p'))
+        classifier.fit(np.array(classifier_json.get('data')),
+                       np.array(classifier_json.get('labels')))
+        f.close()
+    else:
+        classifier = KNeighborsClassifier()
+        classifier = fit_sudokuextract_classifier(classifier)
+        f = gzip.open(file_path, 'wb')
+        pickle.dump(classifier.to_json(), f, protocol=protocol)
+        f.close()
     return classifier

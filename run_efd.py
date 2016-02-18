@@ -19,12 +19,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-import os
-import numpy as np
+
 import matplotlib.pyplot as plt
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.tree import DecisionTreeClassifier
 
 from sudokuextract.extract import parse_sudoku
 from sudokuextract.ml import fit
@@ -50,10 +46,6 @@ r = urlopen(image_url)
 s = BytesIO(r.read())
 the_image = Image.open(s)
 
-#classifier = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(max_depth=5), n_estimators=200)
-#classifier = RandomForestClassifier(n_estimators=100)
-#classifier = KNeighborsClassifier()
-#classifier = fit.fit_sudokuextract_classifier(classifier)
 classifier = fit.get_default_sudokuextract_classifier()
 
 preds, sudoku, subimage = parse_sudoku(the_image, classifier)

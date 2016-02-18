@@ -16,7 +16,6 @@ from __future__ import absolute_import
 
 import os
 import sys
-import unittest
 
 try:
     from urllib.request import urlopen
@@ -50,9 +49,9 @@ def _get_parsed_img(nbr=1):
     return parsed_img
 
 
-class TestEFDClassifier(unittest.TestCase):
+class TestEFDClassifier(object):
     """Testing the SudokuExtract with default classifier."""
-    def setUp(self):
+    def __init__(self):
         self.classifier = get_default_sudokuextract_classifier()
 
     def _print_sudokus(self, parsed_sudoku, correct_sudoku):
@@ -60,11 +59,16 @@ class TestEFDClassifier(unittest.TestCase):
         for ser, cr in zip(parsed_sudoku.split('\n'), correct_sudoku.split('\n')):
             print("{0} =? {1}".format(ser, cr))
 
-    def test_image_1(self):
-        """Test Image 1"""
-        image = _get_img(1)
-        correct_sudoku = _get_parsed_img(1)
-        self._process_an_image(image, correct_sudoku)
+    def test_images(self):
+        """Test a lot of images.
+        """
+        def _test_fcn(nbr):
+            image = _get_img(nbr)
+            correct_sudoku = _get_parsed_img(nbr)
+            self._process_an_image(image, correct_sudoku)
+
+        for i in _range(1, 16):
+            yield _test_fcn, i
 
     def test_image_1_cmd_1(self):
         """Test Image 1 via command line tool."""
@@ -81,12 +85,6 @@ class TestEFDClassifier(unittest.TestCase):
         correct_sudoku = _get_parsed_img(1).replace('\n', '')
         self._print_sudokus(parsed_sudoku, correct_sudoku)
         assert parsed_sudoku == correct_sudoku
-
-    def test_image_2(self):
-        """Test Image 2"""
-        image = _get_img(2)
-        correct_sudoku = _get_parsed_img(2)
-        self._process_an_image(image, correct_sudoku)
 
     def test_image_2_cmd_1(self):
         """Test Image 1 via command line tool."""

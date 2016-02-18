@@ -15,17 +15,16 @@ Library for extracting Sudokus from images using [scikit-image](http://scikit-im
 Requirements
 ------------
 
-* `numpy>=1.9.2`
-* `scipy>=0.15.1`
-* `scikit-learn>=0.17`
-* `scikit-image>=0.11.3`
-* `Pillow>=3.1.0`
-* `pyefd>=0.1.0`
+* ``numpy>=1.9.2``
+* ``scipy>=0.15.1``
+* ``scikit-image>=0.11.3``
+* ``Pillow>=3.1.0``
+* ``pyefd>=0.1.0``
 
 Usage
 -----
 
-::
+Install via `pip`::
 
     $ pip install sudokuextract
 
@@ -66,19 +65,15 @@ It can also be used as a regular Python package::
     072504310
     900302004
 
-There are possibilites of using a classifier of your own creation when
+There are possibilities of using a classifier of your own creation when
 predicting digits; see the documentation for more details.
 
 Testing
 -------
 
-Run tests with::
+Run tests with `nosetests <https://nose.readthedocs.org>`_::
 
-    $ python setup.py test
-
-or with `Pytest <http://pytest.org/latest/>`_::
-
-    $ py.test tests.py
+    $ nosetests tests.py
 
 
 Documentation

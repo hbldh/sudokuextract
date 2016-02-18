@@ -71,7 +71,7 @@ class TestEFDClassifier(object):
             self._print_sudokus(parsed_sudoku, correct_sudoku)
             assert parsed_sudoku == correct_sudoku
 
-        for i in xrange(1, 3):
+        for i in _range(1, 3):
             yield _test_fcn, i
 
     def test_image_1_cmd_1(self):

@@ -25,7 +25,6 @@ import gzip
 
 import numpy as np
 try:
-    raise ImportError()
     from sklearn.neighbors import KNeighborsClassifier
     _use_sklearn = True
 except ImportError:

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 :mod:`knn`
-==================
+==========
 
 Created by hbldh <henrik.blidh@nedomkull.com>
 Created on 2016-02-18
@@ -23,6 +23,9 @@ class KNeighborsClassifier(object):
 
     Read more at e.g. `Wikipedia <http://en.wikipedia.org/wiki/K-nearest_neighbor_algorithm`_
 
+    Note that this classifier borrows heavily of the structure and documentation
+    of the one in scikit-learn!
+
     Parameters
     ----------
     n_neighbors : int, optional (default = 5)
@@ -42,8 +45,7 @@ class KNeighborsClassifier(object):
     metric : string or DistanceMetric object (default = 'minkowski')
         the distance metric to use for the tree.  The default metric is
         minkowski, and with p=2 is equivalent to the standard Euclidean
-        metric. See the documentation of the DistanceMetric class for a
-        list of available metrics.
+        metric.
 
     p : integer, optional (default = 2)
         Power parameter for the Minkowski metric. When p = 1, this is
@@ -60,20 +62,6 @@ class KNeighborsClassifier(object):
     KNeighborsClassifier(...)
     >>> print(neigh.predict([[1.1]]))
     [0]
-    >>> print(neigh.predict_proba([[0.9]]))
-    [[ 0.66666667  0.33333333]]
-
-    Notes
-    -----
-    See :ref:`Nearest Neighbors <neighbors>` in the online documentation
-    for a discussion of the choice of ``algorithm`` and ``leaf_size``.
-
-    .. warning::
-
-       Regarding the Nearest Neighbors algorithms, if it is found that two
-       neighbors, neighbor `k+1` and `k`, have identical distances but
-       but different labels, the results will depend on the ordering of the
-       training data.
 
     """
 

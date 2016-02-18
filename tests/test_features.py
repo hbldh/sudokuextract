@@ -16,7 +16,6 @@ from __future__ import absolute_import
 
 import os
 import sys
-import unittest
 
 try:
     from urllib.request import urlopen
@@ -66,12 +65,9 @@ class TestEFDClassifier(object):
         def _test_fcn(nbr):
             image = _get_img(nbr)
             correct_sudoku = _get_parsed_img(nbr)
-            predictions, sudoku, subimage = parse_sudoku(image, self.classifier)
-            parsed_sudoku = predictions_to_suduko_string(predictions)
-            self._print_sudokus(parsed_sudoku, correct_sudoku)
-            assert parsed_sudoku == correct_sudoku
+            self._process_an_image(image, correct_sudoku)
 
-        for i in _range(1, 3):
+        for i in _range(1, 16):
             yield _test_fcn, i
 
     def test_image_1_cmd_1(self):

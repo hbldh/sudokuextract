@@ -1,3 +1,7 @@
+v0.6.1 (2016-02-20)
+===================
+- Patch for tests in Python 3.
+
 v0.6.0 (2016-02-19)
 ===================
 - Simplified blob extraction.

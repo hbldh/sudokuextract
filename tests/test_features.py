@@ -67,7 +67,7 @@ class TestEFDClassifier(object):
             correct_sudoku = _get_parsed_img(nbr)
             self._process_an_image(image, correct_sudoku)
 
-        for i in _range(1, 16):
+        for i in _range(1, 3):
             yield _test_fcn, i
 
     def test_image_1_cmd_1(self):

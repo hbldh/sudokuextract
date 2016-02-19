@@ -26,7 +26,8 @@ from io import BytesIO
 from PIL import Image
 
 
-from sudokuextract.extract import parse_sudoku, predictions_to_suduko_string, main
+from sudokuextract.extract import parse_sudoku, main
+from sudokuextract.utils import predictions_to_suduko_string
 from sudokuextract.ml.fit import get_default_sudokuextract_classifier
 
 try:

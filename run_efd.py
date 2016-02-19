@@ -41,7 +41,11 @@ from PIL import Image
 #from sudokuextract.data import create_data_set_from_images
 #create_data_set_from_images(path_to_data_dir=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sudokuextract/data'))
 
-image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
+#image_url = "http://res.cloudinary.com/hzlcxa6rf/image/upload/v1455863684/56c6b782f7660b13e127c27f.jpg"
+image_url = "http://res.cloudinary.com/hzlcxa6rf/image/upload/v1455863684/56c6b3e1f7660b13e127c27c.jpg"
+#image_url = "http://res.cloudinary.com/hzlcxa6rf/image/upload/v1455863684/56c6ed05b14fa30009681c92.jpg"
+
+#image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
 r = urlopen(image_url)
 s = BytesIO(r.read())
 the_image = Image.open(s)
@@ -51,7 +55,7 @@ classifier = fit.get_default_sudokuextract_classifier()
 preds, sudoku, subimage = parse_sudoku(the_image, classifier)
 
 ax = plt.subplot2grid((9, 9+9), (0, 0), colspan=9, rowspan=9)
-ax.imshow(the_image, plt.cm.gray)
+ax.imshow(subimage, plt.cm.gray)
 ax.axis('off')
 
 for k in _range(len(sudoku)):

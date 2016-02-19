@@ -26,7 +26,7 @@ import numpy as np
 from skimage.transform import resize
 from PIL import Image
 
-from sudokuextract.imgproc.binary import to_binary
+from sudokuextract.imgproc.binary import to_binary_otsu
 from sudokuextract.extract import extraction_iterator
 
 _url_to_mnist_train_data = "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz"
@@ -180,7 +180,7 @@ def create_data_set_from_images(path_to_data_dir, training_set=True):
                         for kk in range(len(sudoku[k])):
                             img = sudoku[k][kk]
                             img = resize(img, (28, 28))
-                            img = to_binary(img)
+                            img = to_binary_otsu(img)
                             images.append(img)
                             labels.append(int(parsed_img[k][kk]))
                     break

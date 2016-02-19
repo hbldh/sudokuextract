@@ -21,7 +21,7 @@ from skimage.morphology import skeletonize
 from skimage.filters import gaussian_filter, threshold_adaptive
 
 
-def to_binary(img, invert=False):
+def to_binary_otsu(img, invert=False):
     if img.max() == img.min():
         return np.array(img, 'uint8')
     else:
@@ -49,9 +49,3 @@ def add_border(img, size=(28, 28), border_size=0, background_value=255):
     else:
         output_img[border_size:-border_size, border_size:-border_size] = img
     return output_img
-
-
-def to_skeleton(img):
-    img = to_binary(img)
-    img //= 255
-    return skeletonize(1 - img)

@@ -14,13 +14,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
-
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
-
 import numpy as np
 
 from sudokuextract.exceptions import SudokuExtractError
@@ -30,6 +23,7 @@ from sudokuextract.imgproc.lines import get_extremes
 from sudokuextract.imgproc.geometry import warp_image, split_image_into_sudoku_pieces
 from sudokuextract.imgproc.contour import get_contours
 from sudokuextract.ml.predict import classify_efd_features
+from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
 
 
 def extraction_iterator_deprecated(image, n=10):

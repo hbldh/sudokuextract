@@ -16,7 +16,10 @@ from __future__ import absolute_import
 
 from io import BytesIO
 import os
-from urllib2 import urlopen
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 
 from PIL import Image
 

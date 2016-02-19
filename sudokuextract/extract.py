@@ -14,72 +14,40 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-import os
-
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
-
-from io import BytesIO
-
-from PIL import Image
 import numpy as np
 
+from sudokuextract.exceptions import SudokuExtractError
 from sudokuextract.imgproc.binary import to_binary_adaptive
 from sudokuextract.imgproc.blob import get_n_largest_blobs, add_border, get_extremes_of_n_largest_blobs
 from sudokuextract.imgproc.lines import get_extremes
 from sudokuextract.imgproc.geometry import warp_image, split_image_into_sudoku_pieces
 from sudokuextract.imgproc.contour import get_contours
 from sudokuextract.ml.predict import classify_efd_features
+from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
 
 
-def load_image(image_path):
-    return Image.open(os.path.abspath(os.path.expanduser(image_path)))
-
-
-def download_image(image_url):
-    r = urlopen(image_url)
-    s = BytesIO(r.read())
-    return Image.open(s)
-
-
-def extract(image, n=10):
+def extraction_iterator_deprecated(image, n=10):
     img = image.convert('L')
     blobs = get_n_largest_blobs(img, n=n)
-    sudoku = None
     for blob in blobs:
         try:
             c = get_contours(add_border(to_binary_adaptive(blob), size=blob.shape, border_size=1))[0]
             corner_points = get_extremes(np.fliplr(c), blob)
             warped_image = warp_image(corner_points, blob)
-            sudoku = split_image_into_sudoku_pieces(to_binary_adaptive(warped_image))
+            bin_image = to_binary_adaptive(warped_image)
+            sudoku = split_image_into_sudoku_pieces(bin_image)
         except:
-            raise
+            pass
         else:
-            break
-    return sudoku
+            yield sudoku, bin_image
 
 
 def extraction_iterator(image, n=10):
     img = image.convert('L')
-    blobs = get_n_largest_blobs(img, n=n)
-    for blob in blobs:
-        try:
-            c = get_contours(add_border(to_binary_adaptive(blob), size=blob.shape, border_size=1))[0]
-            corner_points = get_extremes(np.fliplr(c), blob)
-            warped_image = warp_image(corner_points, blob)
-            sudoku = split_image_into_sudoku_pieces(to_binary_adaptive(warped_image))
-        except:
-            pass
-        else:
-            yield sudoku, warped_image
-
-
-def extraction_iterator_2(image, n=10):
-    img = image.convert('L')
-    blobs = get_extremes_of_n_largest_blobs(img, n=n)
-    for corner_points in blobs:
+    # If the image is too small, then double its scale until big enough.
+    while max(img.size) < 500:
+        img = img.resize(np.array(img.size) * 2)
+    for corner_points in get_extremes_of_n_largest_blobs(img, n=n):
         try:
             warped_image = warp_image(corner_points, img)
             bin_image = to_binary_adaptive(warped_image)
@@ -97,16 +65,7 @@ def parse_sudoku(image, classifier):
         imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
         if np.sum(preds > 0) >= 17:
             return preds, imgs, subimage
-    raise
-
-
-def predictions_to_suduko_string(predictions, oneliner=False):
-    if oneliner:
-        joining_char = ""
-    else:
-        joining_char = "\n"
-    return joining_char.join(["".join([str(p) if p not in (-1, -2) else '0'
-                              for p in pred_row]) for pred_row in predictions])
+    raise SudokuExtractError("Could not extract any Sudoku from this image.")
 
 
 def main():

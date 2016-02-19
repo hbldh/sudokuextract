@@ -26,7 +26,8 @@ from io import BytesIO
 from PIL import Image
 
 
-from sudokuextract.extract import parse_sudoku, predictions_to_suduko_string, main
+from sudokuextract.extract import parse_sudoku, main
+from sudokuextract.utils import predictions_to_suduko_string, download_image
 from sudokuextract.ml.fit import get_default_sudokuextract_classifier
 
 try:
@@ -59,9 +60,13 @@ class TestEFDClassifier(object):
         for ser, cr in zip(parsed_sudoku.split('\n'), correct_sudoku.split('\n')):
             print("{0} =? {1}".format(ser, cr))
 
+    def _print_sudokus_oneliners(self, parsed_sudoku, correct_sudoku):
+        print("Row comparison SudokuExtract -> Correct:\n-----------------------")
+        for ser, cr in zip(parsed_sudoku.split('\n'), correct_sudoku.split('\n')):
+            print("{0}\n{1}".format(ser, cr))
+
     def test_images(self):
-        """Test a lot of images.
-        """
+        """Test the images located in this folder."""
         def _test_fcn(nbr):
             image = _get_img(nbr)
             correct_sudoku = _get_parsed_img(nbr)
@@ -69,6 +74,29 @@ class TestEFDClassifier(object):
 
         for i in _range(1, 3):
             yield _test_fcn, i
+
+    def test_xanadoku_sudokus(self):
+        """If API key to Xanadoku is present, then"""
+        if os.environ.get('XANADOKU_API_TOKEN') is not None:
+
+            def _xanadoku_tester(sudoku_doc):
+                if not sudoku_doc.get('verified'):
+                    return
+                image = download_image(sudoku_doc.get('raw_image_url'))
+                predictions, sudoku, subimage = parse_sudoku(image, self.classifier)
+                parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
+                print(sudoku_doc.get('_id'))
+                self._print_sudokus_oneliners(parsed_sudoku, sudoku_doc.get('parsed_sudoku'))
+                assert parsed_sudoku == sudoku_doc.get('parsed_sudoku')
+
+            import json
+            url = "https://xanadoku.herokuapp.com/getallsudokus/" + os.environ.get('XANADOKU_API_TOKEN')
+            xanadoku_sudokus = json.loads(urlopen(url).read()).get('sudokus')
+            for s in xanadoku_sudokus:
+                yield _xanadoku_tester, s
+
+        else:
+            assert True
 
     def test_image_1_cmd_1(self):
         """Test Image 1 via command line tool."""

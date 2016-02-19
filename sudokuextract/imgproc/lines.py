@@ -64,7 +64,6 @@ def get_intersections(lines, image):
 
 
 def get_extremes(points, image):
-
     top_left = sorted(points, key=lambda x: np.linalg.norm(np.array(x)))[0]
     top_right = sorted(points, key=lambda x: np.linalg.norm(np.array(x) - [image.shape[1], 0]))[0]
     bottom_left = sorted(points, key=lambda x: np.linalg.norm(np.array(x) - [0, image.shape[0]]))[0]

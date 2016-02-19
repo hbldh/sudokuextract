@@ -17,11 +17,10 @@ from __future__ import absolute_import
 import numpy as np
 from skimage.transform import resize
 from skimage.filters import threshold_otsu
-from skimage.morphology import skeletonize
 from skimage.filters import gaussian_filter, threshold_adaptive
 
 
-def to_binary(img, invert=False):
+def to_binary_otsu(img, invert=False):
     if img.max() == img.min():
         return np.array(img, 'uint8')
     else:
@@ -32,8 +31,20 @@ def to_binary(img, invert=False):
 
 
 def to_binary_adaptive(img):
-    bimg = gaussian_filter(img, sigma=1.0)
-    bimg = threshold_adaptive(bimg, 20, offset=2 / 255)
+
+    sigma = 1.0
+    m = max(img.shape)
+    if m > 2000:
+        block_size = 80
+    elif m > 1500:
+        block_size = 50
+    elif m > 1000:
+        block_size = 35
+    else:
+        block_size = 20
+
+    bimg = gaussian_filter(img, sigma=sigma)
+    bimg = threshold_adaptive(bimg, block_size, offset=2 / 255)
     bimg = np.array(bimg, 'uint8') * 255
     return bimg
 
@@ -49,9 +60,3 @@ def add_border(img, size=(28, 28), border_size=0, background_value=255):
     else:
         output_img[border_size:-border_size, border_size:-border_size] = img
     return output_img
-
-
-def to_skeleton(img):
-    img = to_binary(img)
-    img //= 255
-    return skeletonize(1 - img)

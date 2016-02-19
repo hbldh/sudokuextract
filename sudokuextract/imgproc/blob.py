@@ -27,7 +27,8 @@ from skimage.filters import gaussian_filter, threshold_adaptive
 from skimage.measure import label
 from skimage.measure import regionprops
 
-from sudokuextract.imgproc.binary import to_binary, add_border
+from sudokuextract.imgproc.binary import to_binary_otsu, add_border
+from sudokuextract.imgproc.contour import get_contours
 
 
 def get_n_largest_blobs(image, n=5):
@@ -78,7 +79,11 @@ def get_extremes_of_n_largest_blobs(image, n=5):
         # skip small images
         if region.area < int(np.prod(size) * 0.05):
             continue
-        coords = np.fliplr(region.coords)
+        coords = get_contours(add_border(label_image == region.label,
+                                         size=label_image.shape,
+                                         border_size=1,
+                                         background_value=False))[0]
+        coords = np.fliplr(coords)
 
         top_left = sorted(coords, key=lambda x: np.linalg.norm(np.array(x)))[0]
         top_right = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [img.shape[1], 0]))[0]
@@ -190,11 +195,11 @@ def _get_most_centered_blob(image):
 
 
 def get_centered_blob(img, border_size=1):
-    img = to_binary(img)
+    img = to_binary_otsu(img)
     blob = _get_most_centered_blob(img)
     if blob is None:
         return None
     blob_img = add_border(blob, (28, 28), border_size=border_size)
-    blob_img = to_binary(blob_img)
+    blob_img = to_binary_otsu(blob_img)
 
     return blob_img

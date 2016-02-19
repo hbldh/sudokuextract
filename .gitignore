@@ -2,6 +2,8 @@
 
 train-images-idx3-ubyte.gz
 train-labels-idx1-ubyte.gz
+img*.jpg
+img*.txt
 
 ### Python template
 # Byte-compiled / optimized / DLL files

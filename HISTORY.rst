@@ -1,8 +1,13 @@
+v0.6.0 (2016-02-19)
+===================
+- Simplified blob extraction.
+- Added adaptive block_size for ``to_binary_adaptive``.
+- Added tests that fetch Sudokus from Xanadoku.
+
 v0.5.0 (2016-02-18)
 ===================
 - Removed hard dependency on scikit-learn.
 - Included an own K-Nearest-Neighbors classifier as default.
--
 
 v0.4.0 (2016-02-17)
 ===================

@@ -91,7 +91,7 @@ class TestEFDClassifier(object):
 
             import json
             url = "https://xanadoku.herokuapp.com/getallsudokus/" + os.environ.get('XANADOKU_API_TOKEN')
-            xanadoku_sudokus = json.loads(urlopen(url).read()).get('sudokus')
+            xanadoku_sudokus = json.loads(urlopen(url).read().decode('utf-8')).get('sudokus')
             for s in xanadoku_sudokus:
                 yield _xanadoku_tester, s
 

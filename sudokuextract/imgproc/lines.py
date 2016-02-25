@@ -20,14 +20,13 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import numpy as np
-from skimage.filters import gaussian_filter, threshold_adaptive
 from skimage.transform import hough_line, hough_line_peaks
+
+from sudokuextract.imgproc.binary import to_binary_adaptive
 
 
 def get_lines(image):
-    bimg = gaussian_filter(image, sigma=1.0)
-    bimg = threshold_adaptive(bimg, 20, offset=2/255)
-    bimg = -bimg
+    bimg = -to_binary_adaptive(image)
 
     h, theta, d = hough_line(bimg)
     row1, col1 = image.shape

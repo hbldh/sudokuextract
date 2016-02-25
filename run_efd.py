@@ -24,30 +24,21 @@ import matplotlib.pyplot as plt
 
 from sudokuextract.extract import parse_sudoku
 from sudokuextract.ml import fit
+from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
 
 try:
     _range = xrange
 except NameError:
     _range = range
 
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
-from io import BytesIO
-
-from PIL import Image
-
+#import os
 #from sudokuextract.data import create_data_set_from_images
-#create_data_set_from_images(path_to_data_dir=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sudokuextract/data'))
+#create_data_set_from_images(path_to_data_dir="~/Documents/SudokuExtract_Train")
 
 image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
-r = urlopen(image_url)
-s = BytesIO(r.read())
-the_image = Image.open(s)
+the_image = download_image(image_url)
 
 classifier = fit.get_default_sudokuextract_classifier()
-
 preds, sudoku, subimage = parse_sudoku(the_image, classifier)
 
 ax = plt.subplot2grid((9, 9+9), (0, 0), colspan=9, rowspan=9)

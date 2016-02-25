@@ -29,9 +29,7 @@ def load_image(image_path):
 
 
 def download_image(image_url):
-    r = urlopen(image_url)
-    s = BytesIO(r.read())
-    return Image.open(s)
+    return Image.open(BytesIO(urlopen(image_url).read()))
 
 
 def predictions_to_suduko_string(predictions, oneliner=False):

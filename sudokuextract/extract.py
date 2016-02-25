@@ -18,15 +18,15 @@ import numpy as np
 
 from sudokuextract.exceptions import SudokuExtractError
 from sudokuextract.imgproc.binary import to_binary_adaptive
-from sudokuextract.imgproc.blob import get_n_largest_blobs, add_border, get_extremes_of_n_largest_blobs
+from sudokuextract.imgproc.blob import get_n_largest_blobs, add_border, get_extremes_of_n_largest_blobs, iter_blob_contours
 from sudokuextract.imgproc.lines import get_extremes
-from sudokuextract.imgproc.geometry import warp_image, split_image_into_sudoku_pieces
-from sudokuextract.imgproc.contour import get_contours
+from sudokuextract.imgproc.geometry import warp_image, warp_image_by_interp_borders, split_image_into_sudoku_pieces, \
+    get_contours
 from sudokuextract.ml.predict import classify_efd_features
 from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
 
 
-def extraction_iterator_deprecated(image, n=10):
+def _extraction_iterator_v05(image, n=10):
     img = image.convert('L')
     blobs = get_n_largest_blobs(img, n=n)
     for blob in blobs:
@@ -42,7 +42,7 @@ def extraction_iterator_deprecated(image, n=10):
             yield sudoku, bin_image
 
 
-def extraction_iterator(image, n=10):
+def _extraction_iterator_v06(image, n=10):
     img = image.convert('L')
     # If the image is too small, then double its scale until big enough.
     while max(img.size) < 500:
@@ -58,13 +58,31 @@ def extraction_iterator(image, n=10):
             yield sudoku, bin_image
 
 
+def _extraction_iterator(image):
+    img = image.convert('L')
+    # If the image is too small, then double its scale until big enough.
+    while max(img.size) < 1000:
+        img = img.resize(np.array(img.size) * 2)
+    for edges in iter_blob_contours(img):
+        try:
+            warped_image = warp_image_by_interp_borders(edges, img)
+            sudoku = split_image_into_sudoku_pieces(warped_image)
+        except Exception as e:
+            pass
+        else:
+            yield sudoku, warped_image
+
+
 def parse_sudoku(image, classifier):
-    for sudoku, subimage in extraction_iterator(image):
-        pred_n_imgs = [[classify_efd_features(sudoku[k][kk], classifier) for kk in range(9)] for k in range(9)]
-        preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
-        imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
-        if np.sum(preds > 0) >= 17:
-            return preds, imgs, subimage
+    for sudoku, subimage in _extraction_iterator(image):
+        try:
+            pred_n_imgs = [[classify_efd_features(sudoku[k][kk], classifier) for kk in range(9)] for k in range(9)]
+            preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
+            imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
+            if np.sum(preds > 0) >= 17:
+                return preds, imgs, subimage
+        except Exception as e:
+            pass
     raise SudokuExtractError("Could not extract any Sudoku from this image.")
 
 

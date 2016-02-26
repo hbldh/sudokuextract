@@ -123,6 +123,7 @@ def warp_image_by_projmap_borders(edges, image):
 
 
 def split_image_into_sudoku_pieces(image):
+
     L = image.shape[0]
     d = int(np.ceil(L / 9))
     dd = d // 6

@@ -81,8 +81,8 @@ def parse_sudoku(image, classifier, use_local_thresholding=False):
             pred_n_imgs = classify_sudoku(sudoku, classifier, False)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
             imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
-            if np.sum(preds > 0) >= 17:
-                return preds, imgs, subimage
+            #if np.sum(preds > 0) >= 17:
+            return preds, imgs, subimage
         except Exception as e:
             pass
     raise SudokuExtractError("Could not extract any Sudoku from this image.")

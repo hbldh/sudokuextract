@@ -71,7 +71,9 @@ class TestEFDClassifier(object):
             image = _get_img(nbr)
             correct_sudoku = _get_parsed_img(nbr)
             self._process_an_image(image, correct_sudoku)
-        for i in _range(1, 19):
+        _, _, files = os.walk(os.path.dirname(__file__)).next()
+        n_test_files = sum([os.path.splitext(f)[1].lower() == '.jpg' for f in files]) + 1
+        for i in _range(1, n_test_files):
             yield _test_fcn, i
 
     def test_xanadoku_sudokus(self):
@@ -85,6 +87,9 @@ class TestEFDClassifier(object):
                 image = download_image(sudoku_doc.get('raw_image_url'))
                 predictions, sudoku, subimage = parse_sudoku(image, self.classifier)
                 parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
+                if parsed_sudoku != sudoku_doc.get('parsed_sudoku'):
+                    predictions, sudoku, subimage = parse_sudoku(image, self.classifier, use_local_thresholding=True)
+                    parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
                 self._print_sudokus_oneliners(parsed_sudoku, sudoku_doc.get('parsed_sudoku'))
                 assert parsed_sudoku == sudoku_doc.get('parsed_sudoku')
 

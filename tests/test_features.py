@@ -71,8 +71,9 @@ class TestEFDClassifier(object):
             image = _get_img(nbr)
             correct_sudoku = _get_parsed_img(nbr)
             self._process_an_image(image, correct_sudoku)
-
-        for i in _range(1, 3):
+        _, _, files = list(os.walk(os.path.dirname(__file__)))[0]
+        n_test_files = sum([os.path.splitext(f)[1].lower() == '.jpg' for f in files]) + 1
+        for i in _range(1, n_test_files):
             yield _test_fcn, i
 
     def test_xanadoku_sudokus(self):
@@ -82,10 +83,13 @@ class TestEFDClassifier(object):
             def _xanadoku_tester(sudoku_doc):
                 if not sudoku_doc.get('verified'):
                     return
+                print(sudoku_doc.get('_id'))
                 image = download_image(sudoku_doc.get('raw_image_url'))
                 predictions, sudoku, subimage = parse_sudoku(image, self.classifier)
                 parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
-                print(sudoku_doc.get('_id'))
+                if parsed_sudoku != sudoku_doc.get('parsed_sudoku'):
+                    predictions, sudoku, subimage = parse_sudoku(image, self.classifier, use_local_thresholding=True)
+                    parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
                 self._print_sudokus_oneliners(parsed_sudoku, sudoku_doc.get('parsed_sudoku'))
                 assert parsed_sudoku == sudoku_doc.get('parsed_sudoku')
 
@@ -132,7 +136,7 @@ class TestEFDClassifier(object):
 
     def test_url_1_straight(self):
         url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
-        image = Image.open(BytesIO(urlopen(url).read()))
+        image = download_image(url)
         solution = ("041006029\n"
                     "300790000\n"
                     "009000308\n"
@@ -163,5 +167,8 @@ class TestEFDClassifier(object):
     def _process_an_image(self, image, correct_sudoku):
         predictions, sudoku, subimage = parse_sudoku(image, self.classifier)
         parsed_sudoku = predictions_to_suduko_string(predictions)
+        if parsed_sudoku != correct_sudoku:
+            predictions, sudoku, subimage = parse_sudoku(image, self.classifier, use_local_thresholding=True)
+            parsed_sudoku = predictions_to_suduko_string(predictions)
         self._print_sudokus(parsed_sudoku, correct_sudoku)
         assert parsed_sudoku == correct_sudoku

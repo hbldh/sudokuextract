@@ -31,9 +31,7 @@ except ImportError:
     from sudokuextract.ml.knn import KNeighborsClassifier
     _use_sklearn = False
 
-from sudokuextract.data import get_sudokuextract_data, get_mnist_data
-from sudokuextract.ml.features import extract_efd_features
-from sudokuextract.imgproc.blob import blobify
+from sudokuextract.data import get_sudokuextract_data
 
 try:
     _range = xrange
@@ -43,77 +41,10 @@ except NameError:
 
 def fit_sudokuextract_classifier(classifier):
     print("Fetch SudokuExtract data...")
-    images, y = get_sudokuextract_data(flat_images=False)
-    print("Pre-blobify:  Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(y))]))
-    _, mask = blobify(images)
-    images = list(itertools.compress(images, mask))
-    y = y[mask]
-
-    print("Extract features...")
-    images, mask = blobify(images)
-    y = y[mask]
-    X = np.array([extract_efd_features(img) for img in images])
+    X, y = get_sudokuextract_data(flat_images=False)
 
     print("Train classifier on SudokuExtract data...")
-    print("Post-blobify: Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(y))]))
-    classifier.fit(X, y)
-
-    print("Completed training.")
-    return classifier
-
-
-def fit_mnist_classifier(classifier):
-    print("Fetch MNIST data...")
-    images, y = get_mnist_data(flat_images=False)
-    zeros_mask = y != 0
-    images = itertools.compress(images, zeros_mask)
-    y = y[zeros_mask]
-
-    print("Extract features...")
-    X = np.array([np.array(extract_efd_features(img)) for img in images])
-
-    print("Train classifier on MNIST data...")
     print("Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(y))]))
-    classifier.fit(X, y)
-
-    print("Completed training.")
-    return classifier
-
-
-def fit_combined_classifier(classifier):
-    print("Fetch MNIST and SudokuExtract data...")
-    images1, y1 = get_sudokuextract_data(flat_images=False)
-    images2, y2 = get_mnist_data(flat_images=False)
-    zeros_mask = y2 != 0
-    images2 = itertools.compress(images2, zeros_mask)
-    y2 = y2[zeros_mask]
-    images = images1 + list(images2)
-    y = np.concatenate((y1, y2))
-    _, mask = blobify(images)
-    images = list(itertools.compress(images, mask))
-    y = y[mask]
-
-    print("Extract features...")
-    X = np.array([extract_efd_features(img) for img in images])
-
-    print("Train classifier on MNIST data...")
-    print("Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(y))]))
-    classifier.fit(X, y)
-
-    print("Completed training.")
-    return classifier
-
-
-def get_default_mnist_classifier():
-    print("Fetch MNIST data...")
-    images, y = get_mnist_data(flat_images=False)
-    images, mask = blobify(images)
-    y = y[mask]
-    X = np.array([x.flatten() for x in images])
-
-    print("Train classifier on MNIST data...")
-    print("Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(y))]))
-    classifier = KNeighborsClassifier()
     classifier.fit(X, y)
 
     print("Completed training.")

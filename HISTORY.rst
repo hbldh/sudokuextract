@@ -1,3 +1,10 @@
+v0.7.0 (2016-02-26)
+===================
+- Two different extraction methods:
+    * Local thresholding
+    * Adaptive thresholding for entire image
+- Refactored extensively and updated classifiers.
+
 v0.6.1 (2016-02-20)
 ===================
 - Patch for tests in Python 3.

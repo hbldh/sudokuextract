@@ -21,8 +21,13 @@ from skimage.filters import gaussian_filter, threshold_adaptive
 
 
 def to_binary_otsu(img, invert=False):
+    if img.dtype == np.bool:
+        img = np.array(img, 'uint8')
     if img.max() == img.min():
-        return np.array(img, 'uint8')
+        if img.min() == 1:
+            return np.array(img * 255, 'uint8')
+        else:
+            return np.array(img, 'uint8')
     else:
         t = threshold_otsu(img)
     img[img <= t] = 255 if invert else 0

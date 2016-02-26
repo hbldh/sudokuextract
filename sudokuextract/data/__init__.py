@@ -20,14 +20,14 @@ try:
     _range = xrange
 except NameError:
     _range = range
-
+import itertools
 
 import numpy as np
-from skimage.transform import resize
 from PIL import Image
 
-from sudokuextract.imgproc.binary import to_binary_otsu
-from sudokuextract.extract import extraction_iterator
+from sudokuextract.extract import _extraction_iterator
+from sudokuextract.ml.features import extract_efd_features
+from sudokuextract.imgproc.blob import blobify
 
 _url_to_mnist_train_data = "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz"
 _url_to_mnist_train_labels = "http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz"
@@ -125,27 +125,27 @@ def _sudokuextract_data(flat_images=False):
     fname = resource_filename('sudokuextract.data', "se-train-data.gz")
     if resource_exists('sudokuextract.data', "se-train-data.gz"):
         f = gzip.open(fname, mode='rb')
-        data = f.read()
+        data = np.load(f)
         f.close()
     else:
         raise IOError("SudokuExtract Training data file was not present!")
 
-    return _load_images_file(data, 2051, flat_images)
+    return data#_load_images_file(data, 2051, flat_images)
 
 
 def _sudokuextract_labels():
     fname = resource_filename('sudokuextract.data', "se-train-labels.gz")
     if resource_exists('sudokuextract.data', "se-train-labels.gz"):
         f = gzip.open(fname, mode='rb')
-        data = f.read()
+        data = np.load(f)
         f.close()
     else:
         raise IOError("SudokuExtract Training labels file was not present!")
 
-    return _load_labels_file(data, 2049)
+    return data #_load_labels_file(data, 2049)
 
 
-def create_data_set_from_images(path_to_data_dir, training_set=True):
+def create_data_set_from_images(path_to_data_dir):
 
     try:
         import matplotlib.pyplot as plt
@@ -166,71 +166,94 @@ def create_data_set_from_images(path_to_data_dir, training_set=True):
             image = Image.open(os.path.join(path_to_data_dir, f))
             with open(os.path.join(path_to_data_dir, "{0}.txt".format(file_name)), 'rt') as f:
                 parsed_img = f.read().strip().split('\n')
-            for sudoku in extraction_iterator(image):
-                for k in range(len(sudoku)):
-                    for kk in range(len(sudoku[k])):
-                        ax = plt.subplot2grid((9, 9), (k, kk))
-                        ax.imshow(sudoku[k][kk], plt.cm.gray)
-                        ax.set_title(str(parsed_img[k][kk]))
-                        ax.axis('off')
-                plt.show()
-                ok = raw_input("Is this OK (y/N)? ")
+            for sudoku, subimage in _extraction_iterator(image):
+                #for k in range(len(sudoku)):
+                #    for kk in range(len(sudoku[k])):
+                #        ax = plt.subplot2grid((9, 9), (k, kk))
+                #        ax.imshow(sudoku[k][kk], plt.cm.gray)
+                #        ax.set_title(str(parsed_img[k][kk]))
+                #        ax.axis('off')
+                #plt.show()
+                ok = "y"#raw_input("Is this OK (y/N/a)? ")
                 if ok == 'y':
                     for k in range(len(sudoku)):
                         for kk in range(len(sudoku[k])):
-                            img = sudoku[k][kk]
-                            img = resize(img, (28, 28))
-                            img = to_binary_otsu(img)
-                            images.append(img)
+                            images.append(sudoku[k][kk].copy())
                             labels.append(int(parsed_img[k][kk]))
                     break
-    if training_set:
-        save_training_data(images, labels)
-    else:
-        save_test_data(images, labels)
+                if ok == 'a':
+                    break
+            for sudoku, subimage in _extraction_iterator(image, use_local_thresholding=True):
+                #for k in range(len(sudoku)):
+                #    for kk in range(len(sudoku[k])):
+                #        ax = plt.subplot2grid((9, 9), (k, kk))
+                #        ax.imshow(sudoku[k][kk], plt.cm.gray)
+                #        ax.set_title(str(parsed_img[k][kk]))
+                #        ax.axis('off')
+                #plt.show()
+                ok = 'y'# raw_input("Is this OK (y/N/a)? ")
+                if ok == 'y':
+                    for k in range(len(sudoku)):
+                        for kk in range(len(sudoku[k])):
+                            images.append(sudoku[k][kk].copy())
+                            labels.append(int(parsed_img[k][kk]))
+                    break
+                if ok == 'a':
+                    break
+
+    try:
+        os.makedirs(os.path.expanduser('~/sudokuextract'))
+    except:
+        pass
+
+    try:
+        for i, (img, lbl) in enumerate(zip(images, labels)):
+            img = Image.fromarray(img, 'L')
+            with open(os.path.expanduser('~/sudokuextract/{1}_{0:04d}.jpg'.format(i+1, lbl)), 'w') as f:
+                img.save(f)
+    except Exception as e:
+        print(e)
+
+    print("Pre-blobify:  Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(labels))]))
+    y = np.array(labels, 'int8')
+    images, mask = blobify(images)
+    y = y[mask]
+    print("Post-blobify:  Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(y))]))
+
+    print("Extract features...")
+    X = np.array([extract_efd_features(img) for img in images])
+
+    return images, labels, X, y
 
 
-def save_training_data(images, labels):
-    if len(labels) != len(images):
-        raise TypeError("Length of images ({0}) was not identical "
-                        "to length of labels ({1})".format(len(images), len(labels)))
+def save_training_data(X, y):
+    _save_data('train', X, y)
 
-    # Convert images to numpy array.
-    if not isinstance(images, np.ndarray):
-        images = np.array([img.flatten() for img in images])
 
-    # Write images
-    fname = resource_filename('sudokuextract.data', "se-train-data.gz")
+def save_test_data(X, y):
+    _save_data('test', X, y)
+
+
+def _save_data(which, X, y)    :
+    if X.shape[0] != len(y):
+        raise TypeError("Length of data samples ({0}) was not identical "
+                        "to length of labels ({1})".format(X.shape[0], len(y)))
+
+    # Convert to numpy array.
+    if not isinstance(X, np.ndarray):
+        X = np.array(X)
+    if not isinstance(y, np.ndarray):
+        y = np.array(y)
+
+    # Write feature_data
+    fname = resource_filename('sudokuextract.data', "se-{0}-data.gz".format(which))
     with gzip.GzipFile(fname, mode='wb') as f:
-        f.write(struct.pack('>4i', 2051, len(images), 28, 28))
-        for img in images:
-            f.write(img.tostring())
+        np.save(f, X)
 
     # Write labels
-    fname = resource_filename('sudokuextract.data', "se-train-labels.gz")
+    fname = resource_filename('sudokuextract.data', "se-{0}-labels.gz".format(which))
     with gzip.GzipFile(fname, mode='wb') as f:
-        f.write(struct.pack('>2i', 2049, len(labels)))
-        f.write(np.array(labels, 'uint8').tostring())
+        np.save(f, y)
 
 
-def save_test_data(images, labels):
-    if len(labels) != len(images):
-        raise TypeError("Length of images ({0}) was not identical "
-                        "to length of labels ({1})".format(len(images), len(labels)))
 
-    # Convert images to numpy array.
-    if not isinstance(images, np.ndarray):
-        images = np.array([img.flatten() for img in images])
-
-    # Write images
-    fname = resource_filename('sudokuextract.data', "se-test-data.gz")
-    with gzip.GzipFile(fname, mode='wb') as f:
-        f.write(struct.pack('>4i', 2051, len(images), 28, 28))
-        for img in images:
-            f.write(img.tostring())
-
-    # Write labels
-    fname = resource_filename('sudokuextract.data', "se-test-labels.gz")
-    with gzip.GzipFile(fname, mode='wb') as f:
-        f.write(struct.pack('>2i', 2049, len(labels)))
-        f.write(np.array(labels, 'uint8').tostring())

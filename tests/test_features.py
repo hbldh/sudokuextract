@@ -71,7 +71,7 @@ class TestEFDClassifier(object):
             image = _get_img(nbr)
             correct_sudoku = _get_parsed_img(nbr)
             self._process_an_image(image, correct_sudoku)
-        _, _, files = os.walk(os.path.dirname(__file__)).next()
+        _, _, files = list(os.walk(os.path.dirname(__file__)))[0]
         n_test_files = sum([os.path.splitext(f)[1].lower() == '.jpg' for f in files]) + 1
         for i in _range(1, n_test_files):
             yield _test_fcn, i

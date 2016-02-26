@@ -20,9 +20,8 @@ from sudokuextract.exceptions import SudokuExtractError
 from sudokuextract.imgproc.binary import to_binary_adaptive
 from sudokuextract.imgproc.blob import get_n_largest_blobs, add_border, get_extremes_of_n_largest_blobs, iter_blob_contours
 from sudokuextract.imgproc.lines import get_extremes
-from sudokuextract.imgproc.geometry import warp_image, warp_image_by_interp_borders, split_image_into_sudoku_pieces, \
-    get_contours
-from sudokuextract.ml.predict import classify_efd_features
+from sudokuextract.imgproc import geometry
+from sudokuextract.ml.predict import classify_sudoku
 from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
 
 
@@ -31,11 +30,11 @@ def _extraction_iterator_v05(image, n=10):
     blobs = get_n_largest_blobs(img, n=n)
     for blob in blobs:
         try:
-            c = get_contours(add_border(to_binary_adaptive(blob), size=blob.shape, border_size=1))[0]
+            c = geometry.get_contours(add_border(to_binary_adaptive(blob), size=blob.shape, border_size=1))[0]
             corner_points = get_extremes(np.fliplr(c), blob)
-            warped_image = warp_image(corner_points, blob)
+            warped_image = geometry.warp_image(corner_points, blob)
             bin_image = to_binary_adaptive(warped_image)
-            sudoku = split_image_into_sudoku_pieces(bin_image)
+            sudoku = geometry.split_image_into_sudoku_pieces_adaptive_global(bin_image)
         except:
             pass
         else:
@@ -58,25 +57,28 @@ def _extraction_iterator_v06(image, n=10):
             yield sudoku, bin_image
 
 
-def _extraction_iterator(image):
+def _extraction_iterator(image, use_local_thresholding=False):
     img = image.convert('L')
     # If the image is too small, then double its scale until big enough.
     while max(img.size) < 1000:
         img = img.resize(np.array(img.size) * 2)
     for edges in iter_blob_contours(img):
         try:
-            warped_image = warp_image_by_interp_borders(edges, img)
-            sudoku = split_image_into_sudoku_pieces(warped_image)
+            warped_image = geometry.warp_image_by_interp_borders(edges, img)
+            if use_local_thresholding:
+                sudoku = geometry.split_image_into_sudoku_pieces_otsu_local(warped_image)
+            else:
+                sudoku = geometry.split_image_into_sudoku_pieces_adaptive_global(warped_image)
         except Exception as e:
             pass
         else:
             yield sudoku, warped_image
 
 
-def parse_sudoku(image, classifier):
-    for sudoku, subimage in _extraction_iterator(image):
+def parse_sudoku(image, classifier, use_local_thresholding=False):
+    for sudoku, subimage in _extraction_iterator(image, use_local_thresholding):
         try:
-            pred_n_imgs = [[classify_efd_features(sudoku[k][kk], classifier) for kk in range(9)] for k in range(9)]
+            pred_n_imgs = classify_sudoku(sudoku, classifier, False)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
             imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
             if np.sum(preds > 0) >= 17:

@@ -71,7 +71,7 @@ class TestEFDClassifier(object):
             image = _get_img(nbr)
             correct_sudoku = _get_parsed_img(nbr)
             self._process_an_image(image, correct_sudoku)
-        for i in _range(1, 3):
+        for i in _range(1, 19):
             yield _test_fcn, i
 
     def test_xanadoku_sudokus(self):
@@ -162,5 +162,8 @@ class TestEFDClassifier(object):
     def _process_an_image(self, image, correct_sudoku):
         predictions, sudoku, subimage = parse_sudoku(image, self.classifier)
         parsed_sudoku = predictions_to_suduko_string(predictions)
+        if parsed_sudoku != correct_sudoku:
+            predictions, sudoku, subimage = parse_sudoku(image, self.classifier, use_local_thresholding=True)
+            parsed_sudoku = predictions_to_suduko_string(predictions)
         self._print_sudokus(parsed_sudoku, correct_sudoku)
         assert parsed_sudoku == correct_sudoku

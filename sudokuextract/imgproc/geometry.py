@@ -17,7 +17,7 @@ from __future__ import absolute_import
 from operator import attrgetter
 
 import numpy as np
-from skimage.morphology import binary_closing
+from skimage.morphology import binary_closing, binary_erosion, binary_opening, disk
 from skimage.transform import warp, ProjectiveTransform
 from skimage.measure import find_contours
 
@@ -122,8 +122,7 @@ def warp_image_by_projmap_borders(edges, image):
     return wi
 
 
-def split_image_into_sudoku_pieces(image):
-
+def split_image_into_sudoku_pieces_adaptive_global(image):
     L = image.shape[0]
     d = int(np.ceil(L / 9))
     dd = d // 6
@@ -137,7 +136,28 @@ def split_image_into_sudoku_pieces(image):
             start_col_i = max([kk * d - dd, 0])
             stop_col_i = min([(kk + 1) * d + dd, L])
             i = image[start_row_i:stop_row_i, start_col_i:stop_col_i].copy()
-            i = binary_closing(i)
+            i = binary_opening(i)
+            i = to_binary_otsu(i)
+            this_row.append(i)
+        output.append(this_row)
+    return output
+
+
+def split_image_into_sudoku_pieces_otsu_local(image):
+    L = image.shape[0]
+    d = int(np.ceil(L / 9))
+    dd = d // 6
+    output = []
+    for k in range(9):
+        this_row = []
+        start_row_i = max([k * d - dd, 0])
+        stop_row_i = min([(k + 1) * d + dd, L])
+        for kk in range(9):
+            start_col_i = max([kk * d - dd, 0])
+            stop_col_i = min([(kk + 1) * d + dd, L])
+            i = image[start_row_i:stop_row_i, start_col_i:stop_col_i].copy()
+            i = to_binary_otsu(i)
+            i = binary_opening(i)
             i = to_binary_otsu(i)
             this_row.append(i)
         output.append(this_row)

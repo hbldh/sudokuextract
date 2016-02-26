@@ -38,14 +38,14 @@ except NameError:
 #image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
 
 #image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/56c6347a6f74ee0009de88cf"
-image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/56c6b782f7660b13e127c27f"
-the_image = download_image(image_url)
+#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/56c6b782f7660b13e127c27f"
+#the_image = download_image(image_url)
 
-#the_image = load_image('~/Documents/SudokuExtract_Test/img1.jpg')
-#the_image = the_image.rotate(-90)
+the_image = load_image('~/Documents/SudokuExtract_Test/img1.jpg')
+the_image = the_image.rotate(-90)
 
 classifier = fit.get_default_sudokuextract_classifier()
-preds, sudoku, subimage = parse_sudoku(the_image, classifier)
+preds, sudoku, subimage = parse_sudoku(the_image, classifier, True)
 
 ax = plt.subplot2grid((9, 9+9), (0, 0), colspan=9, rowspan=9)
 ax.imshow(subimage, plt.cm.gray)

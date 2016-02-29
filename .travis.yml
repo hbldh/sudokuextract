@@ -25,6 +25,10 @@ addons:
     - build-essential
 install:
   - "pip install pytest"
+  - "pip install pytest-cov"
+  - "pip install python-coveralls"
   - "travis_wait pip install -r travis_subrequirements.txt"
   - "pip install -r requirements.txt"
-script: py.test tests
+script: py.test tests --cov sudokuextract --cov-report term-missing
+after_success:
+  - coveralls

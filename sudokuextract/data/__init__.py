@@ -36,43 +36,15 @@ def _toS32(bits):
     return struct.unpack_from(">i", bits)[0]
 
 
-def _load_images_file(data, correct_magic_number=2051, flat_images=False):
-    magic_number = _toS32(data[:4])
-    if magic_number != correct_magic_number:
-        raise ValueError("Error parsing images file. Read magic number {0} != {1}!".format(
-            magic_number, correct_magic_number))
-    n_images = _toS32(data[4:8])
-    n_rows = _toS32(data[8:12])
-    n_cols = _toS32(data[12:16])
-    images = np.fromstring(data[16:], 'uint8').reshape(n_images, n_rows*n_cols)
-
-    if not flat_images:
-        images = [imrow.reshape(28, 28) for imrow in images]
-
-    return images
-
-
-def _load_labels_file(data, correct_magic_number=2049):
-    magic_number = _toS32(data[:4])
-    if magic_number != correct_magic_number:
-        raise ValueError("Error parsing labels file. Read magic number {0} != {1}!".format(
-            magic_number, correct_magic_number))
-    n_labels = _toS32(data[4:8])
-    return np.fromstring(data[8:], 'uint8')
-
-
-def get_mnist_data(flat_images=False):
-    X, y = _mnist_data(flat_images), _mnist_labels()
-    if isinstance(X, list):
-        for k in _range(len(X)):
-            X[k] = 255 - X[k]
-    else:
-        X = 255 - X
+def get_mnist_data():
+    X, y = _mnist_data(), _mnist_labels()
+    for k in _range(len(X)):
+        X[k] = 255 - X[k]
 
     return X, y
 
 
-def _mnist_data(flat_images=False):
+def _mnist_data():
     fname = resource_filename('sudokuextract.data', "train-images-idx3-ubyte.gz")
     if resource_exists('sudokuextract.data', "train-images-idx3-ubyte.gz"):
         f = gzip.open(fname, mode='rb')
@@ -91,7 +63,17 @@ def _mnist_data(flat_images=False):
         except:
             pass
 
-    return _load_images_file(data, 2051, flat_images)
+    correct_magic_number = 2051
+    magic_number = _toS32(data[:4])
+    if magic_number != correct_magic_number:
+        raise ValueError("Error parsing images file. Read magic number {0} != {1}!".format(
+            magic_number, correct_magic_number))
+    n_images = _toS32(data[4:8])
+    n_rows = _toS32(data[8:12])
+    n_cols = _toS32(data[12:16])
+    images = np.fromstring(data[16:], 'uint8').reshape(n_images, n_rows*n_cols)
+
+    return [imrow.reshape(28, 28) for imrow in images]
 
 
 def _mnist_labels():
@@ -113,14 +95,20 @@ def _mnist_labels():
         except:
             pass
 
-    return _load_labels_file(data, 2049)
+    correct_magic_number = 2049
+    magic_number = _toS32(data[:4])
+    if magic_number != correct_magic_number:
+        raise ValueError("Error parsing labels file. Read magic number {0} != {1}!".format(
+            magic_number, correct_magic_number))
+    n_labels = _toS32(data[4:8])
+    return np.fromstring(data[8:], 'uint8')
 
 
-def get_sudokuextract_data(flat_images=False):
-    return _sudokuextract_data(flat_images), _sudokuextract_labels()
+def get_sudokuextract_data():
+    return _sudokuextract_data(), _sudokuextract_labels()
 
 
-def _sudokuextract_data(flat_images=False):
+def _sudokuextract_data():
     fname = resource_filename('sudokuextract.data', "se-train-data.gz")
     if resource_exists('sudokuextract.data', "se-train-data.gz"):
         f = gzip.open(fname, mode='rb')
@@ -129,7 +117,7 @@ def _sudokuextract_data(flat_images=False):
     else:
         raise IOError("SudokuExtract Training data file was not present!")
 
-    return data#_load_images_file(data, 2051, flat_images)
+    return data
 
 
 def _sudokuextract_labels():
@@ -141,7 +129,7 @@ def _sudokuextract_labels():
     else:
         raise IOError("SudokuExtract Training labels file was not present!")
 
-    return data #_load_labels_file(data, 2049)
+    return data
 
 
 def create_data_set_from_images(path_to_data_dir):
@@ -166,14 +154,14 @@ def create_data_set_from_images(path_to_data_dir):
             with open(os.path.join(path_to_data_dir, "{0}.txt".format(file_name)), 'rt') as f:
                 parsed_img = f.read().strip().split('\n')
             for sudoku, subimage in _extraction_iterator(image):
-                #for k in range(len(sudoku)):
-                #    for kk in range(len(sudoku[k])):
-                #        ax = plt.subplot2grid((9, 9), (k, kk))
-                #        ax.imshow(sudoku[k][kk], plt.cm.gray)
-                #        ax.set_title(str(parsed_img[k][kk]))
-                #        ax.axis('off')
-                #plt.show()
-                ok = "y"#raw_input("Is this OK (y/N/a)? ")
+                for k in range(len(sudoku)):
+                    for kk in range(len(sudoku[k])):
+                        ax = plt.subplot2grid((9, 9), (k, kk))
+                        ax.imshow(sudoku[k][kk], plt.cm.gray)
+                        ax.set_title(str(parsed_img[k][kk]))
+                        ax.axis('off')
+                plt.show()
+                ok = raw_input("Is this OK (y/N/a)? ")
                 if ok == 'y':
                     for k in range(len(sudoku)):
                         for kk in range(len(sudoku[k])):
@@ -183,14 +171,14 @@ def create_data_set_from_images(path_to_data_dir):
                 if ok == 'a':
                     break
             for sudoku, subimage in _extraction_iterator(image, use_local_thresholding=True):
-                #for k in range(len(sudoku)):
-                #    for kk in range(len(sudoku[k])):
-                #        ax = plt.subplot2grid((9, 9), (k, kk))
-                #        ax.imshow(sudoku[k][kk], plt.cm.gray)
-                #        ax.set_title(str(parsed_img[k][kk]))
-                #        ax.axis('off')
-                #plt.show()
-                ok = 'y'# raw_input("Is this OK (y/N/a)? ")
+                for k in range(len(sudoku)):
+                    for kk in range(len(sudoku[k])):
+                        ax = plt.subplot2grid((9, 9), (k, kk))
+                        ax.imshow(sudoku[k][kk], plt.cm.gray)
+                        ax.set_title(str(parsed_img[k][kk]))
+                        ax.axis('off')
+                plt.show()
+                ok = raw_input("Is this OK (y/N/a)? ")
                 if ok == 'y':
                     for k in range(len(sudoku)):
                         for kk in range(len(sudoku[k])):
@@ -233,7 +221,7 @@ def save_test_data(X, y):
     _save_data('test', X, y)
 
 
-def _save_data(which, X, y)    :
+def _save_data(which, X, y):
     if X.shape[0] != len(y):
         raise TypeError("Length of data samples ({0}) was not identical "
                         "to length of labels ({1})".format(X.shape[0], len(y)))

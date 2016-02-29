@@ -24,7 +24,7 @@ addons:
     - gfortran
     - build-essential
 install:
-  - "pip install coverage"
+  - "pip install pytest"
   - "travis_wait pip install -r travis_subrequirements.txt"
   - "pip install -r requirements.txt"
-script: nosetests tests --with-coverage --cover-package=sudokuextract
+script: py.test tests

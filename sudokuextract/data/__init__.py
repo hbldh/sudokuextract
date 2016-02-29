@@ -20,7 +20,6 @@ try:
     _range = xrange
 except NameError:
     _range = range
-import itertools
 
 import numpy as np
 from PIL import Image

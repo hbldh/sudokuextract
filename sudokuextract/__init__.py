@@ -15,7 +15,7 @@ __url__ = 'https://github.com/hbldh/sudokuextract'
 __platforms__ = 'any'
 _keywords__ = ['Image Processing', 'Sudoku']
 __classifiers__ = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: MIT License',

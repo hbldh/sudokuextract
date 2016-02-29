@@ -1,0 +1,6 @@
+[run]
+branch = True
+source = sudokuextract
+include = */sudokuextract/*
+omit =
+    */setup.py

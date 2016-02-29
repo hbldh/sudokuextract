@@ -9,6 +9,8 @@ SudokuExtract
     :target: https://pypi.python.org/pypi/sudokuextract/
 .. image:: http://img.shields.io/pypi/l/sudokuextract.svg
     :target: https://pypi.python.org/pypi/sudokuextract/
+.. image:: https://coveralls.io/repos/github/hbldh/sudokuextract/badge.svg?branch=master
+    :target: https://coveralls.io/github/hbldh/sudokuextract?branch=master
 
 Library for extracting Sudokus from images using `scikit-image <http://scikit-image.org/>`_.
 

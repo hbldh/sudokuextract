@@ -146,7 +146,10 @@ def test_images(nbr):
 if os.environ.get('XANADOKU_API_TOKEN') is not None:
     import json
     _url = "https://xanadoku.herokuapp.com/getallsudokus/" + os.environ.get('XANADOKU_API_TOKEN')
-    xanadoku_sudokus = json.loads(urlopen(_url).read().decode('utf-8')).get('sudokus')
+    try:
+        xanadoku_sudokus = json.loads(urlopen(_url).read().decode('utf-8')).get('sudokus')
+    except:
+        xanadoku_sudokus = []
 else:
     xanadoku_sudokus = []
 

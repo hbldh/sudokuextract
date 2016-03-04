@@ -114,6 +114,51 @@ def iter_blob_contours(image):
     raise SudokuExtractError("No suitable blob could be found.")
 
 
+def iter_blob_extremes(image):
+    original_shape = image.size
+    if max(image.size) < 2000:
+        size = (500, 500)
+        y_scale = original_shape[0] / 500
+        x_scale = original_shape[1] / 500
+    else:
+        size = (1000, 1000)
+        y_scale = original_shape[0] / 1000
+        x_scale = original_shape[1] / 1000
+
+    img = np.array(image.resize(size))
+    bimg = gaussian_filter(img, sigma=1.0)
+    bimg = threshold_adaptive(bimg, 20, offset=2/255)
+    bimg = -bimg
+    bimg = ndi.binary_fill_holes(bimg)
+    label_image = label(bimg, background=False)
+    label_image += 1
+
+    regions = regionprops(label_image)
+    regions.sort(key=attrgetter('area'), reverse=True)
+
+    for region in regions:
+        try:
+            # skip small images
+            if region.area < int(np.prod(size) * 0.05):
+                continue
+            coords = get_contours(add_border(label_image == region.label,
+                                             size=label_image.shape,
+                                             border_size=1,
+                                             background_value=False))[0]
+            coords = np.fliplr(coords)
+
+            top_left = sorted(coords, key=lambda x: np.linalg.norm(np.array(x)))[0]
+            top_right = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [img.shape[1], 0]))[0]
+            bottom_left = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [0, img.shape[0]]))[0]
+            bottom_right = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [img.shape[1], img.shape[0]]))[0]
+            scaled_extremes = [(int(x[0] * y_scale), int(x[1]*x_scale)) for x in (top_left, top_right, bottom_left, bottom_right)]
+
+            yield scaled_extremes
+        except Exception:
+            pass
+    raise SudokuExtractError("No suitable blob could be found.")
+
+
 def blobify(images):
     output_data = []
     mask = []

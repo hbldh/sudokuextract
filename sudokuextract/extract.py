@@ -17,10 +17,25 @@ from __future__ import absolute_import
 import numpy as np
 
 from sudokuextract.exceptions import SudokuExtractError
-from sudokuextract.imgproc.blob import iter_blob_contours
+from sudokuextract.imgproc.blob import iter_blob_contours, iter_blob_extremes
 from sudokuextract.imgproc import geometry
 from sudokuextract.ml.predict import classify_sudoku
 from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
+
+def _extraction_iterator_v06(image, use_local_thresholding=False):
+    img = image.convert('L')
+    # If the image is too small, then double its scale until big enough.
+    while max(img.size) < 500:
+        img = img.resize(np.array(img.size) * 2)
+    for corner_points in iter_blob_extremes(img):
+        try:
+            warped_image = geometry.warp_image_by_corner_points_projection(corner_points, img)
+            sudoku = geometry.split_image_into_sudoku_pieces_adaptive_global(
+                warped_image, otsu_local=use_local_thresholding)
+        except:
+            pass
+        else:
+            yield sudoku, warped_image
 
 
 def _extraction_iterator(image, use_local_thresholding=False):

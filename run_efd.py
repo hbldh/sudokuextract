@@ -38,11 +38,11 @@ except NameError:
 
 #image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
 
-#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/56c6347a6f74ee0009de88cf"
-#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/56c6b782f7660b13e127c27f"
-#the_image = download_image(image_url)
+image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/v1457105627/56d9aad9ae834500099af4da.jpg"
+#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/v1457115360/56d9d0df9f94ac0009519152.jpg"
+the_image = download_image(image_url)
 
-the_image = load_image('~/Documents/SudokuExtract_Train/img18.jpg')
+#the_image = load_image('~/Documents/SudokuExtract_Train/img18.jpg')
 #the_image = the_image.rotate(-90)
 
 classifier = fit.get_default_sudokuextract_classifier()

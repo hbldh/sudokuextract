@@ -17,11 +17,41 @@ from __future__ import absolute_import
 from operator import attrgetter
 
 import numpy as np
-from skimage.morphology import binary_closing, binary_erosion, binary_opening, disk
+from skimage.morphology import binary_opening
+from skimage.filters import gaussian_filter
 from skimage.transform import warp, ProjectiveTransform
 from skimage.measure import find_contours
 
 from sudokuextract.imgproc.binary import to_binary_otsu, to_binary_adaptive
+
+
+def warp_image_by_corner_points_projection(corner_points, image):
+    """Given corner points of a Sudoku, warps original selection to a square image.
+
+    :param corner_points:
+    :type: corner_points: list
+    :param image:
+    :type image:
+    :return:
+    :rtype:
+
+    """
+    # Clarify by storing in named variables.
+    top_left, top_right, bottom_left, bottom_right = np.array(corner_points)
+
+    top_edge = np.linalg.norm(top_right - top_left)
+    bottom_edge = np.linalg.norm(bottom_right - bottom_left)
+    left_edge = np.linalg.norm(top_left - bottom_left)
+    right_edge = np.linalg.norm(top_right - bottom_right)
+
+    L = int(np.ceil(max([top_edge, bottom_edge, left_edge, right_edge])))
+    src = np.array([top_left, top_right, bottom_left, bottom_right])
+    dst = np.array([[0, 0], [L - 1, 0], [0, L - 1], [L - 1, L - 1]])
+
+    tr = ProjectiveTransform()
+    tr.estimate(dst, src)
+
+    return warp(image, tr, output_shape=(L, L))
 
 
 def warp_image_by_interp_borders(edges, image):
@@ -53,16 +83,16 @@ def warp_image_by_interp_borders(edges, image):
     d_right_edge = np.linalg.norm(right_edge[0, :] - right_edge[-1, :])
 
     d = int(np.ceil(max([d_top_edge, d_bottom_edge, d_left_edge, d_right_edge])))
-    wi = warp(image, _mapping_fcn, output_shape=(d, d))
-
-    return wi
+    return warp(image, _mapping_fcn, output_shape=(d, d))
 
 
-def split_image_into_sudoku_pieces_adaptive_global(image, otsu_local=False):
+def split_image_into_sudoku_pieces_adaptive_global(image, otsu_local=False, apply_gaussian=False):
     L = image.shape[0]
     d = int(np.ceil(L / 9))
     dd = d // 6
     output = []
+    if apply_gaussian:
+        image = gaussian_filter(image, sigma=10.0)
     if not otsu_local:
         image = to_binary_adaptive(image)
     for k in range(9):
@@ -79,7 +109,7 @@ def split_image_into_sudoku_pieces_adaptive_global(image, otsu_local=False):
             i = to_binary_otsu(i)
             this_row.append(i)
         output.append(this_row)
-    return output
+    return output, image
 
 
 def get_contours(img, contour_param=0.8):

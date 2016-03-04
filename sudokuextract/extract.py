@@ -30,12 +30,12 @@ def _extraction_iterator_v06(image, use_local_thresholding=False):
     for corner_points in iter_blob_extremes(img):
         try:
             warped_image = geometry.warp_image_by_corner_points_projection(corner_points, img)
-            sudoku = geometry.split_image_into_sudoku_pieces_adaptive_global(
+            sudoku, bin_image = geometry.split_image_into_sudoku_pieces_adaptive_global(
                 warped_image, otsu_local=use_local_thresholding)
         except:
             pass
         else:
-            yield sudoku, warped_image
+            yield sudoku, bin_image
 
 
 def _extraction_iterator(image, use_local_thresholding=False):
@@ -46,12 +46,12 @@ def _extraction_iterator(image, use_local_thresholding=False):
     for edges in iter_blob_contours(img):
         try:
             warped_image = geometry.warp_image_by_interp_borders(edges, img)
-            sudoku = geometry.split_image_into_sudoku_pieces_adaptive_global(
+            sudoku, bin_image = geometry.split_image_into_sudoku_pieces_adaptive_global(
                 warped_image, otsu_local=use_local_thresholding)
         except Exception as e:
             pass
         else:
-            yield sudoku, warped_image
+            yield sudoku, bin_image
 
 
 def parse_sudoku(image, classifier, use_local_thresholding=False):

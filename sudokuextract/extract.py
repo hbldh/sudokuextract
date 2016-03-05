@@ -41,7 +41,6 @@ def extract_sudoku(image, classifier=None, force=False):
     raise SudokuExtractError("Could not extract any Sudoku from this image.")
 
 
-
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Running SudokuExtract as a command line tool")

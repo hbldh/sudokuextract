@@ -31,25 +31,7 @@ try:
 except NameError:
     _range = range
 
-#import os
-#from sudokuextract.data import create_data_set_from_images, save_training_data
-#images, labels, X, y = create_data_set_from_images(path_to_data_dir="~/Documents/SudokuExtract_Train")
-#save_training_data(X, y)
-
-#image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
-
-#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/v1457105627/56d9aad9ae834500099af4da.jpg"
-# With hand-written digits
-#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/v1457115360/56d9d0df9f94ac0009519152.jpg"
-# Test fail.
-#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/v1457115360/56d7fb50832b2d0009ff933c.jpg"
-# Test fail.
-#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/v1457115360/56d9aad9ae834500099af4da.jpg"
-
-image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/v1457115360/56db22c564fc910009a4e55d.jpg"
-
-#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/v1457115360/56db23de64fc910009a4e55e.jpg"
-
+image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
 the_image = download_image(image_url)
 
 #the_image = load_image('~/Documents/SudokuExtract_Train/img18.jpg')

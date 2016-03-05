@@ -271,21 +271,6 @@ def _get_most_centered_blob(image):
     for blob in blobs:
         m = blob.mean()
 
-        row_sums = ((255 - blob) / 255).sum(axis=0)
-        row_sums = row_sums / np.sum(row_sums)
-        weighted_row_sums = row_sums * np.arange(0, blob.shape[1])
-        M_x = np.mean(weighted_row_sums)
-
-        col_sums = ((255 - blob) / 255).sum(axis=1)
-        col_sums = col_sums / np.sum(col_sums)
-        weighted_col_sums = col_sums * np.arange(0, blob.shape[0])
-        M_y = np.mean(weighted_col_sums)
-
-        if (M_x > 0.6) or (M_x < 0.4):
-            continue
-        if (M_y > 0.55) or (M_y < 0.3):
-            continue
-
         # Test 6: If mean value of image is too white, it is probably only captured noise: skip it.
         if m > 230.0:
             continue
@@ -293,10 +278,6 @@ def _get_most_centered_blob(image):
         elif m < 20.0:
             continue
         else:
-            #print(m, M_x, M_y)
-            #import matplotlib.pyplot as plt
-            #plt.imshow(blob, plt.cm.gray)
-            #plt.show()
             return blob
     return None
 

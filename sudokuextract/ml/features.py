@@ -21,7 +21,7 @@ from pyefd import elliptic_fourier_descriptors
 from sudokuextract.imgproc.geometry import get_contours
 
 
-def extract_efd_features(image, n=20):
+def extract_efd_features(image, n=10):
     contours = get_contours(image)
     if len(contours) == 0:
         return np.zeros((4*n))[3:]

@@ -24,7 +24,7 @@ basedir = os.path.dirname(os.path.abspath(__file__))
 if sys.argv[-1] == 'publish':
     os.system('python setup.py register')
     os.system('python setup.py sdist upload')
-    os.system('python setup.py bdist_wheel upload --universal')
+    os.system('python setup.py bdist_wheel upload')
     sys.exit()
 
 

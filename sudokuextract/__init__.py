@@ -15,7 +15,7 @@ __url__ = 'https://github.com/hbldh/sudokuextract'
 __platforms__ = 'any'
 _keywords__ = ['Image Processing', 'Sudoku']
 __classifiers__ = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: MIT License',
@@ -37,9 +37,9 @@ __classifiers__ = [
 # release.  'dev' as a _version_extra string means this is a development
 # version.
 _version_major = 0
-_version_minor = 7
+_version_minor = 8
 _version_patch = 0
-# _version_extra = '.dev1'
+# _version_extra = '.dev5'
 # _version_extra = 'b1'
 _version_extra = ''  # Uncomment this for full releases
 

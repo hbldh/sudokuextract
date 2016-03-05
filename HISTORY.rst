@@ -1,3 +1,10 @@
+v0.8.0 (2016-03-05)
+===================
+- New classifiers with MNIST data.
+- New multi-attempt approach to Sudoku parsing.
+- Using DLXSudoku to attempt classification of correct parsing of Sudoku.
+- Removed a lot of deprecated code.
+
 v0.7.0 (2016-02-26)
 ===================
 - Two different extraction methods:

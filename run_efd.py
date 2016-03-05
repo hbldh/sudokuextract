@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 import matplotlib.pyplot as plt
 
-from sudokuextract.extract import parse_sudoku
+from sudokuextract.extract import extract_sudoku
 from sudokuextract.ml import fit
 from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
 
@@ -31,22 +31,14 @@ try:
 except NameError:
     _range = range
 
-#import os
-#from sudokuextract.data import create_data_set_from_images, save_training_data
-#images, labels, X, y = create_data_set_from_images(path_to_data_dir="~/Documents/SudokuExtract_Train")
-#save_training_data(X, y)
+image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
+the_image = download_image(image_url)
 
-#image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
-
-#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/56c6347a6f74ee0009de88cf"
-#image_url = "https://res.cloudinary.com/hzlcxa6rf/image/upload/56c6b782f7660b13e127c27f"
-#the_image = download_image(image_url)
-
-the_image = load_image('~/Documents/SudokuExtract_Train/img18.jpg')
+#the_image = load_image('~/Documents/SudokuExtract_Train/img18.jpg')
 #the_image = the_image.rotate(-90)
 
 classifier = fit.get_default_sudokuextract_classifier()
-preds, sudoku, subimage = parse_sudoku(the_image, classifier, False)
+preds, sudoku, subimage = extract_sudoku(the_image, classifier, force=True)
 
 ax = plt.subplot2grid((9, 9+9), (0, 0), colspan=9, rowspan=9)
 ax.imshow(subimage, plt.cm.gray)

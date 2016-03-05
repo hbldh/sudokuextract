@@ -31,7 +31,7 @@ except ImportError:
     from sudokuextract.ml.knn import KNeighborsClassifier
     _use_sklearn = False
 
-from sudokuextract.data import get_sudokuextract_data
+from sudokuextract.data import get_sudokuextract_data, get_mnist_data
 
 try:
     _range = xrange
@@ -41,7 +41,7 @@ except NameError:
 
 def fit_sudokuextract_classifier(classifier):
     print("Fetch SudokuExtract data...")
-    X, y = get_sudokuextract_data(flat_images=False)
+    X, y = get_sudokuextract_data()
 
     print("Train classifier on SudokuExtract data...")
     print("Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(y))]))
@@ -51,8 +51,22 @@ def fit_sudokuextract_classifier(classifier):
     return classifier
 
 
-def get_default_sudokuextract_classifier():
+def fit_combined_classifier(classifier):
+    print("Fetch data...")
+    X1, y1 = get_sudokuextract_data()
+    X2, y2 = get_mnist_data()
+    X = np.concatenate([X1, X2[2::25, :]], axis=0)
+    y = np.concatenate([y1, y2[2::25]])
 
+    print("Train classifier on SudokuExtract and MNIST data...")
+    print("Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(y))]))
+    classifier.fit(X, y)
+
+    print("Completed training.")
+    return classifier
+
+
+def get_default_sudokuextract_classifier():
     if _use_sklearn:
         return _load_sklearn_default_classifier()
     else:

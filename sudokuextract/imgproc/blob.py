@@ -34,75 +34,7 @@ from sudokuextract.imgproc.binary import to_binary_otsu, add_border
 from sudokuextract.imgproc.geometry import get_contours
 
 
-def get_n_largest_blobs(image, n=5):
-    if max(image.size) < 2000:
-        size = (500, 500)
-    else:
-        size = (1000, 1000)
-
-    img = np.array(image.resize(size))
-    bimg = gaussian_filter(img, sigma=1.0)
-    bimg = threshold_adaptive(bimg, 20, offset=2/255)
-    bimg = -bimg
-
-    bimg = ndi.binary_fill_holes(bimg)
-    label_image = label(bimg, background=False)
-    label_image += 1
-    blobs = []
-    for region in regionprops(label_image):
-        # skip small images
-        if region.area < int(np.prod(size) * 0.05):
-            continue
-        blobs.append((region.area, region.bbox))
-
-    blobs.sort(key=itemgetter(0))
-    return [img[b[0]:b[2], b[1]:b[3]] for sol, b in blobs[:n]]
-
-
-def get_extremes_of_n_largest_blobs(image, n=5):
-    original_shape = image.size
-    if max(image.size) < 2000:
-        size = (500, 500)
-        y_scale = original_shape[0] / 500
-        x_scale = original_shape[1] / 500
-    else:
-        size = (1000, 1000)
-        y_scale = original_shape[0] / 1000
-        x_scale = original_shape[1] / 1000
-
-    img = np.array(image.resize(size))
-    bimg = gaussian_filter(img, sigma=1.0)
-    bimg = threshold_adaptive(bimg, 20, offset=2/255)
-    bimg = -bimg
-    bimg = ndi.binary_fill_holes(bimg)
-    label_image = label(bimg, background=False)
-    label_image += 1
-    blobs = []
-    for region in regionprops(label_image):
-        # skip small images
-        if region.area < int(np.prod(size) * 0.05):
-            continue
-        coords = get_contours(add_border(label_image == region.label,
-                                         size=label_image.shape,
-                                         border_size=1,
-                                         background_value=False))[0]
-        coords = np.fliplr(coords)
-
-        top_left = sorted(coords, key=lambda x: np.linalg.norm(np.array(x)))[0]
-        top_right = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [img.shape[1], 0]))[0]
-        bottom_left = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [0, img.shape[0]]))[0]
-        bottom_right = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [img.shape[1], img.shape[0]]))[0]
-
-        blobs.append((region.filled_area, (top_left, top_right, bottom_left, bottom_right)))
-
-    blobs.sort(key=itemgetter(0))
-    output = []
-    for blob in blobs[:n]:
-        output.append([(int(x[0] * y_scale), int(x[1]*x_scale)) for x in blob[1]])
-    return output
-
-
-def iter_blob_contours(image):
+def iter_blob_contours(image, n=5):
     original_shape = image.size
     if max(image.size) < 2000:
         size = (500, 500)
@@ -123,8 +55,12 @@ def iter_blob_contours(image):
 
     regions = regionprops(label_image)
     regions.sort(key=attrgetter('area'), reverse=True)
+    iter_n = 0
 
     for region in regions:
+        iter_n += 1
+        if iter_n >= n:
+            break
         try:
             coords = get_contours(add_border(label_image == region.label,
                                              size=label_image.shape,
@@ -177,6 +113,56 @@ def iter_blob_contours(image):
                 bottom_edge = np.concatenate([coords_end_of_array, coords_start_of_array], axis=0)
 
             yield left_edge, top_edge, right_edge, bottom_edge
+        except Exception:
+            pass
+    raise SudokuExtractError("No suitable blob could be found.")
+
+
+def iter_blob_extremes(image, n=5):
+    original_shape = image.size
+    if max(image.size) < 2000:
+        size = (500, 500)
+        y_scale = original_shape[0] / 500
+        x_scale = original_shape[1] / 500
+    else:
+        size = (1000, 1000)
+        y_scale = original_shape[0] / 1000
+        x_scale = original_shape[1] / 1000
+
+    img = np.array(image.resize(size))
+    bimg = gaussian_filter(img, sigma=1.0)
+    bimg = threshold_adaptive(bimg, 20, offset=2/255)
+    bimg = -bimg
+    bimg = ndi.binary_fill_holes(bimg)
+    label_image = label(bimg, background=False)
+    label_image += 1
+
+    regions = regionprops(label_image)
+    regions.sort(key=attrgetter('area'), reverse=True)
+    iter_n = 0
+
+    for region in regions:
+        try:
+            iter_n += 1
+            if iter_n >= n:
+                break
+
+            # Skip small images
+            if region.area < int(np.prod(size) * 0.05):
+                continue
+            coords = get_contours(add_border(label_image == region.label,
+                                             size=label_image.shape,
+                                             border_size=1,
+                                             background_value=False))[0]
+            coords = np.fliplr(coords)
+
+            top_left = sorted(coords, key=lambda x: np.linalg.norm(np.array(x)))[0]
+            top_right = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [img.shape[1], 0]))[0]
+            bottom_left = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [0, img.shape[0]]))[0]
+            bottom_right = sorted(coords, key=lambda x: np.linalg.norm(np.array(x) - [img.shape[1], img.shape[0]]))[0]
+            scaled_extremes = [(int(x[0] * y_scale), int(x[1]*x_scale)) for x in (top_left, top_right, bottom_left, bottom_right)]
+
+            yield scaled_extremes
         except Exception:
             pass
     raise SudokuExtractError("No suitable blob could be found.")
@@ -285,21 +271,6 @@ def _get_most_centered_blob(image):
     for blob in blobs:
         m = blob.mean()
 
-        row_sums = ((255 - blob) / 255).sum(axis=0)
-        row_sums = row_sums / np.sum(row_sums)
-        weighted_row_sums = row_sums * np.arange(0, blob.shape[1])
-        M_x = np.mean(weighted_row_sums)
-
-        col_sums = ((255 - blob) / 255).sum(axis=1)
-        col_sums = col_sums / np.sum(col_sums)
-        weighted_col_sums = col_sums * np.arange(0, blob.shape[0])
-        M_y = np.mean(weighted_col_sums)
-
-        if (M_x > 0.6) or (M_x < 0.4):
-            continue
-        if (M_y > 0.55) or (M_y < 0.3):
-            continue
-
         # Test 6: If mean value of image is too white, it is probably only captured noise: skip it.
         if m > 230.0:
             continue
@@ -307,10 +278,6 @@ def _get_most_centered_blob(image):
         elif m < 20.0:
             continue
         else:
-            #print(m, M_x, M_y)
-            #import matplotlib.pyplot as plt
-            #plt.imshow(blob, plt.cm.gray)
-            #plt.show()
             return blob
     return None
 

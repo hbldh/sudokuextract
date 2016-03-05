@@ -24,7 +24,7 @@ basedir = os.path.dirname(os.path.abspath(__file__))
 if sys.argv[-1] == 'publish':
     os.system('python setup.py register')
     os.system('python setup.py sdist upload')
-    os.system('python setup.py bdist_wheel upload --universal')
+    os.system('python setup.py bdist_wheel upload')
     sys.exit()
 
 
@@ -55,7 +55,8 @@ setup(
         'scipy>=0.15.1',
         'scikit-image>=0.11.3',
         'pillow>=3.1.0',
-        'pyefd>=0.1.0'
+        'pyefd>=0.1.2',
+        'dlxsudoku>=0.10.0'
     ],
     test_suite="tests",
     dependency_links=[],

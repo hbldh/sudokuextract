@@ -53,12 +53,3 @@ def classify_efd_features(image, classifier):
     prediction = classifier.predict(X.reshape((1, len(X))))[0]
 
     return prediction, img
-
-
-def classify_template_matching(image, classifier):
-    img = get_centered_blob(image)
-    if img is None:
-        return -1, image
-    prediction = classifier.predict(img.reshape((1, 28*28)))[0]
-
-    return prediction, img

@@ -34,7 +34,7 @@ from sudokuextract.imgproc.binary import to_binary_otsu, add_border
 from sudokuextract.imgproc.geometry import get_contours
 
 
-def iter_blob_contours(image):
+def iter_blob_contours(image, n=5):
     original_shape = image.size
     if max(image.size) < 2000:
         size = (500, 500)
@@ -55,8 +55,12 @@ def iter_blob_contours(image):
 
     regions = regionprops(label_image)
     regions.sort(key=attrgetter('area'), reverse=True)
+    iter_n = 0
 
     for region in regions:
+        iter_n += 1
+        if iter_n >= n:
+            break
         try:
             coords = get_contours(add_border(label_image == region.label,
                                              size=label_image.shape,
@@ -114,7 +118,7 @@ def iter_blob_contours(image):
     raise SudokuExtractError("No suitable blob could be found.")
 
 
-def iter_blob_extremes(image):
+def iter_blob_extremes(image, n=5):
     original_shape = image.size
     if max(image.size) < 2000:
         size = (500, 500)
@@ -135,10 +139,15 @@ def iter_blob_extremes(image):
 
     regions = regionprops(label_image)
     regions.sort(key=attrgetter('area'), reverse=True)
+    iter_n = 0
 
     for region in regions:
         try:
-            # skip small images
+            iter_n += 1
+            if iter_n >= n:
+                break
+
+            # Skip small images
             if region.area < int(np.prod(size) * 0.05):
                 continue
             coords = get_contours(add_border(label_image == region.label,

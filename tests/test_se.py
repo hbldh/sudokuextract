@@ -27,7 +27,7 @@ except ImportError:
 
 from PIL import Image
 
-from sudokuextract.extract import parse_sudoku, main
+from sudokuextract.extract import extract_sudoku, main
 from sudokuextract.utils import predictions_to_suduko_string, download_image
 from sudokuextract.ml.fit import get_default_sudokuextract_classifier
 
@@ -57,11 +57,8 @@ def classifier():
 
 
 def _process_an_image(image, correct_sudoku):
-    predictions, sudoku, subimage = parse_sudoku(image, classifier())
+    predictions, sudoku, subimage = extract_sudoku(image, classifier())
     parsed_sudoku = predictions_to_suduko_string(predictions)
-    if parsed_sudoku != correct_sudoku:
-        predictions, sudoku, subimage = parse_sudoku(image, classifier(), use_local_thresholding=True)
-        parsed_sudoku = predictions_to_suduko_string(predictions)
     assert parsed_sudoku == correct_sudoku
 
 
@@ -161,10 +158,7 @@ def test_xanadoku_sudokus(sudoku_doc):
     else:
         print(sudoku_doc.get('_id'))
         image = download_image(sudoku_doc.get('raw_image_url'))
-        predictions, sudoku, subimage = parse_sudoku(image, classifier())
+        predictions, sudoku, subimage = extract_sudoku(image, classifier())
         parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
-        if parsed_sudoku != sudoku_doc.get('parsed_sudoku'):
-            predictions, sudoku, subimage = parse_sudoku(image, classifier(), use_local_thresholding=True)
-            parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
         assert parsed_sudoku == sudoku_doc.get('parsed_sudoku')
 

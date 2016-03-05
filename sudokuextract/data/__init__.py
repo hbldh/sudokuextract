@@ -24,7 +24,7 @@ except NameError:
 import numpy as np
 from PIL import Image
 
-from sudokuextract.extract import _extraction_iterator
+from sudokuextract.methods.map import _extraction_iterator_map
 from sudokuextract.ml.features import extract_efd_features
 from sudokuextract.imgproc.blob import blobify
 
@@ -153,7 +153,7 @@ def create_data_set_from_images(path_to_data_dir):
             image = Image.open(os.path.join(path_to_data_dir, f))
             with open(os.path.join(path_to_data_dir, "{0}.txt".format(file_name)), 'rt') as f:
                 parsed_img = f.read().strip().split('\n')
-            for sudoku, subimage in _extraction_iterator(image):
+            for sudoku, subimage in _extraction_iterator_map(image):
                 for k in range(len(sudoku)):
                     for kk in range(len(sudoku[k])):
                         ax = plt.subplot2grid((9, 9), (k, kk))
@@ -170,7 +170,7 @@ def create_data_set_from_images(path_to_data_dir):
                     break
                 if ok == 'a':
                     break
-            for sudoku, subimage in _extraction_iterator(image, use_local_thresholding=True):
+            for sudoku, subimage in _extraction_iterator_map(image, use_local_thresholding=True):
                 for k in range(len(sudoku)):
                     for kk in range(len(sudoku[k])):
                         ax = plt.subplot2grid((9, 9), (k, kk))

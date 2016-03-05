@@ -22,7 +22,7 @@ from __future__ import absolute_import
 
 import matplotlib.pyplot as plt
 
-from sudokuextract.extract import parse_sudoku
+from sudokuextract.extract import extract_sudoku
 from sudokuextract.ml import fit
 from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
 
@@ -46,7 +46,7 @@ the_image = download_image(image_url)
 #the_image = the_image.rotate(-90)
 
 classifier = fit.get_default_sudokuextract_classifier()
-preds, sudoku, subimage = parse_sudoku(the_image, classifier, False)
+preds, sudoku, subimage = extract_sudoku(the_image, classifier, False)
 
 ax = plt.subplot2grid((9, 9+9), (0, 0), colspan=9, rowspan=9)
 ax.imshow(subimage, plt.cm.gray)

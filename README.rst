@@ -21,7 +21,8 @@ Requirements
 * ``scipy>=0.15.1``
 * ``scikit-image>=0.11.3``
 * ``Pillow>=3.1.0``
-* ``pyefd>=0.1.0``
+* ``pyefd>=0.1.2``
+* ``dlxsudoku>=0.10.0``
 
 Usage
 -----
@@ -46,17 +47,13 @@ with an url to an image::
 
 It can also be used as a regular Python package::
 
-    In [1]: from sudokuextract.extract import parse_sudoku, load_image, predictions_to_suduko_string
+    In [1]: from sudokuextract.extract import extract_sudoku, load_image, predictions_to_suduko_string
 
     In [2]: img = load_image('/path/to/sudoku_image.jpg')
 
-    In [3]: from sudokuextract.ml.fit import get_default_sudokuextract_classifier
+    In [3]: predictions, sudoku_box_images, whole_sudoku_image = extract_sudoku(img)
 
-    In [4]: classifier = get_default_sudokuextract_classifier()
-
-    In [5]: predictions, sudoku_box_images, whole_sudoku_image = parse_sudoku(img, classifier)
-
-    In [6]: print(predictions_to_suduko_string(predictions))
+    In [4]: print(predictions_to_suduko_string(predictions))
     800603001
     057401630
     000000000

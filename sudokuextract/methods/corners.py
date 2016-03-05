@@ -26,8 +26,9 @@ from sudokuextract.ml.predict import classify_sudoku
 from sudokuextract.utils import predictions_to_suduko_string
 
 
-def extraction_method_corners(image, classifier, use_local_thresholding=False, n=5, force=False):
-    for sudoku, subimage in _extraction_iterator_corners(image, use_local_thresholding, n=n):
+def extraction_method_corners(image, classifier, use_local_thresholding=False, apply_gaussian=False, n=5, force=False):
+    for sudoku, subimage in _extraction_iterator_corners(
+            image, use_local_thresholding, apply_gaussian=apply_gaussian, n=n):
         try:
             pred_n_imgs = classify_sudoku(sudoku, classifier, False)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
@@ -48,7 +49,7 @@ def extraction_method_corners(image, classifier, use_local_thresholding=False, n
     raise SudokuExtractError("Corner Method could not extract any Sudoku from this image.")
 
 
-def _extraction_iterator_corners(image, use_local_thresholding=False, n=5):
+def _extraction_iterator_corners(image, use_local_thresholding=False, apply_gaussian=False, n=5):
     img = image.convert('L')
     # If the image is too small, then double its scale until big enough.
     while max(img.size) < 500:
@@ -57,7 +58,7 @@ def _extraction_iterator_corners(image, use_local_thresholding=False, n=5):
         try:
             warped_image = geometry.warp_image_by_corner_points_projection(corner_points, img)
             sudoku, bin_image = geometry.split_image_into_sudoku_pieces_adaptive_global(
-                warped_image, otsu_local=use_local_thresholding)
+                warped_image, otsu_local=use_local_thresholding, apply_gaussian=apply_gaussian)
         except SudokuExtractError:
             # Try next blob.
             pass

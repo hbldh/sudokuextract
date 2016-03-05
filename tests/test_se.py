@@ -16,7 +16,6 @@ from __future__ import absolute_import
 
 import os
 import sys
-import unittest
 
 import pytest
 
@@ -158,7 +157,10 @@ def test_xanadoku_sudokus(sudoku_doc):
     else:
         print(sudoku_doc.get('_id'))
         image = download_image(sudoku_doc.get('raw_image_url'))
-        predictions, sudoku, subimage = extract_sudoku(image, classifier())
+        predictions, sudoku, subimage = extract_sudoku(image, classifier(), force=True)
         parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
+        if parsed_sudoku != sudoku_doc.get('parsed_sudoku'):
+            predictions, sudoku, subimage = extract_sudoku(image.rotate(-90), classifier(), force=True)
+            parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
         assert parsed_sudoku == sudoku_doc.get('parsed_sudoku')
 

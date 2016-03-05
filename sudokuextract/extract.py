@@ -37,7 +37,7 @@ def extract_sudoku(image, classifier=None, force=False):
             return predictions, sudoku_box_images, subimage
 
     if force:
-        extraction_method_map(image, classifier)
+        return extraction_method_map(image, classifier, force=True, n=3)
     raise SudokuExtractError("Could not extract any Sudoku from this image.")
 
 

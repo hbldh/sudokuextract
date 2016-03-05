@@ -17,6 +17,7 @@ from __future__ import absolute_import
 import numpy as np
 
 from dlxsudoku.sudoku import Sudoku
+from dlxsudoku.exceptions import SudokuException
 
 from sudokuextract.exceptions import SudokuExtractError
 from sudokuextract.imgproc.blob import iter_blob_contours
@@ -25,16 +26,19 @@ from sudokuextract.ml.predict import classify_sudoku
 from sudokuextract.utils import predictions_to_suduko_string
 
 
-def extraction_method_map(image, classifier, use_local_thresholding=False, apply_gaussian=False, n=5):
+def extraction_method_map(image, classifier, use_local_thresholding=False, apply_gaussian=False, n=5, force=False):
     for sudoku, subimage in _extraction_iterator_map(image, use_local_thresholding, apply_gaussian, n=n):
         try:
             pred_n_imgs = classify_sudoku(sudoku, classifier, False)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
             imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
-            if np.sum(preds > 0) >= 17:
+            if np.sum(preds > 0) >= 17 or force:
                 s = Sudoku(predictions_to_suduko_string(preds))
                 try:
                     s.solve()
+                except SudokuException:
+                    if force:
+                        return preds, imgs, subimage
                 except Exception:
                     pass
                 else:

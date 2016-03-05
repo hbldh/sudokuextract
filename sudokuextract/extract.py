@@ -17,10 +17,10 @@ from __future__ import absolute_import
 from sudokuextract.exceptions import SudokuExtractError
 from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
 from sudokuextract.ml.fit import get_default_sudokuextract_classifier
-from sudokuextract.methods import extraction_methods
+from sudokuextract.methods import extraction_method_map, extraction_methods
 
 
-def extract_sudoku(image, classifier=None):
+def extract_sudoku(image, classifier=None, force=False):
     if classifier is None:
         classifier = get_default_sudokuextract_classifier()
 
@@ -35,7 +35,11 @@ def extract_sudoku(image, classifier=None):
             raise
         else:
             return predictions, sudoku_box_images, subimage
+
+    if force:
+        extraction_method_map(image, classifier)
     raise SudokuExtractError("Could not extract any Sudoku from this image.")
+
 
 
 def main():

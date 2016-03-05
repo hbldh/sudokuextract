@@ -17,6 +17,7 @@ from __future__ import absolute_import
 import numpy as np
 
 from dlxsudoku.sudoku import Sudoku
+from dlxsudoku.exceptions import SudokuException
 
 from sudokuextract.exceptions import SudokuExtractError
 from sudokuextract.imgproc.blob import iter_blob_extremes
@@ -25,7 +26,7 @@ from sudokuextract.ml.predict import classify_sudoku
 from sudokuextract.utils import predictions_to_suduko_string
 
 
-def extraction_method_corners(image, classifier, use_local_thresholding=False, n=5):
+def extraction_method_corners(image, classifier, use_local_thresholding=False, n=5, force=False):
     for sudoku, subimage in _extraction_iterator_corners(image, use_local_thresholding, n=n):
         try:
             pred_n_imgs = classify_sudoku(sudoku, classifier, False)
@@ -35,6 +36,9 @@ def extraction_method_corners(image, classifier, use_local_thresholding=False, n
                 s = Sudoku(predictions_to_suduko_string(preds))
                 try:
                     s.solve()
+                except SudokuException:
+                    if force:
+                        return preds, imgs, subimage
                 except Exception:
                     pass
                 else:

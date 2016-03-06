@@ -15,7 +15,6 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import sys
-import itertools
 from pkg_resources import resource_filename, resource_exists
 try:
     import cPickle as pickle
@@ -55,8 +54,8 @@ def fit_combined_classifier(classifier):
     print("Fetch data...")
     X1, y1 = get_sudokuextract_data()
     X2, y2 = get_mnist_data()
-    X = np.concatenate([X1, X2[2::25, :]], axis=0)
-    y = np.concatenate([y1, y2[2::25]])
+    X = np.concatenate([X1, X2], axis=0)
+    y = np.concatenate([y1, y2])
 
     print("Train classifier on SudokuExtract and MNIST data...")
     print("Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(y))]))
@@ -87,8 +86,8 @@ def _load_sklearn_default_classifier():
         classifier = pickle.load(f)
         f.close()
     else:
-        classifier = KNeighborsClassifier()
-        classifier = fit_sudokuextract_classifier(classifier)
+        classifier = KNeighborsClassifier(n_neighbors=10)
+        classifier = fit_combined_classifier(classifier)
         f = gzip.open(file_path, 'wb')
         pickle.dump(classifier, f, protocol=protocol)
         f.close()
@@ -112,8 +111,8 @@ def _load_sudokuextract_default_classifier():
                        np.array(classifier_json.get('labels')))
         f.close()
     else:
-        classifier = KNeighborsClassifier()
-        classifier = fit_sudokuextract_classifier(classifier)
+        classifier = KNeighborsClassifier(n_neighbors=10)
+        classifier = fit_combined_classifier(classifier)
         f = gzip.open(file_path, 'wb')
         pickle.dump(classifier.to_json(), f, protocol=protocol)
         f.close()

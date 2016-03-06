@@ -32,6 +32,7 @@ def extraction_method_map(image, classifier, use_local_thresholding=False, apply
             pred_n_imgs = classify_sudoku(sudoku, classifier, False)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
             imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
+
             if np.sum(preds > 0) >= 17 or force:
                 s = Sudoku(predictions_to_suduko_string(preds))
                 try:

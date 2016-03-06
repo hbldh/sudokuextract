@@ -33,9 +33,10 @@ def extraction_method_corners(image, classifier, use_local_thresholding=False, a
             pred_n_imgs = classify_sudoku(sudoku, classifier, False)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
             imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
+
             if np.sum(preds > 0) >= 17:
-                s = Sudoku(predictions_to_suduko_string(preds))
                 try:
+                    s = Sudoku(predictions_to_suduko_string(preds))
                     s.solve()
                 except SudokuException:
                     if force:

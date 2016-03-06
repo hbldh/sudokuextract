@@ -59,7 +59,7 @@ def iter_blob_contours(image, n=5):
 
     for region in regions:
         iter_n += 1
-        if iter_n >= n:
+        if iter_n > n:
             break
         try:
             coords = get_contours(add_border(label_image == region.label,
@@ -144,7 +144,7 @@ def iter_blob_extremes(image, n=5):
     for region in regions:
         try:
             iter_n += 1
-            if iter_n >= n:
+            if iter_n > n:
                 break
 
             # Skip small images

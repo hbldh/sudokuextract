@@ -19,17 +19,15 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-
-import matplotlib.pyplot as plt
-
 from sudokuextract.extract import extract_sudoku
 from sudokuextract.ml import fit
-from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
+from sudokuextract.utils import download_image
 
-try:
-    _range = xrange
-except NameError:
-    _range = range
+#from sudokuextract import data
+#images, labels, X, y = data.create_mnist_dataset()
+#data.save_training_data(X, y, data_source='mnist')
+#images, labels, X, y = data.create_data_set_from_images('~/Documents/SudokuExtract_Train')
+#data.save_training_data(X, y, data_source='se')
 
 image_url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
 the_image = download_image(image_url)
@@ -40,17 +38,17 @@ the_image = download_image(image_url)
 classifier = fit.get_default_sudokuextract_classifier()
 preds, sudoku, subimage = extract_sudoku(the_image, classifier, force=True)
 
+import matplotlib.pyplot as plt
 ax = plt.subplot2grid((9, 9+9), (0, 0), colspan=9, rowspan=9)
 ax.imshow(subimage, plt.cm.gray)
 ax.axis('off')
 
-for k in _range(len(sudoku)):
-    for kk in _range(len(sudoku[k])):
+for k in range(len(sudoku)):
+    for kk in range(len(sudoku[k])):
         ax = plt.subplot2grid((9, 9 + 9), (k, 9+kk))
         ax.imshow(sudoku[k][kk], plt.cm.gray)
         ax.set_title(str(preds[k, kk]))
         ax.axis('off')
-
 plt.show()
 
 

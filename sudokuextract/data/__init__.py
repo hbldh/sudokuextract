@@ -249,6 +249,9 @@ def create_mnist_dataset():
     images = list(itertools.compress(images, mask))
     labels = labels[mask]
 
+    images = images[3::20]
+    labels = labels[3::20]
+
     print("Pre-blobify:  Label / N : {0}".format([(v, c) for v, c in zip(_range(10), np.bincount(labels))]))
     y = np.array(labels, 'int8')
     images, mask = blobify(images)

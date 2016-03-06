@@ -24,7 +24,7 @@ def extract_sudoku(image, classifier=None, force=False):
     if classifier is None:
         classifier = get_default_sudokuextract_classifier()
 
-    for method in extraction_methods:
+    for method_name, method in extraction_methods:
         try:
             predictions, sudoku_box_images, subimage = method(image, classifier)
         except SudokuExtractError as e:
@@ -37,7 +37,7 @@ def extract_sudoku(image, classifier=None, force=False):
             return predictions, sudoku_box_images, subimage
 
     if force:
-        return extraction_method_map(image, classifier, force=True, n=3)
+        return extraction_method_map(image, classifier, force=True, n=1)
     raise SudokuExtractError("Could not extract any Sudoku from this image.")
 
 

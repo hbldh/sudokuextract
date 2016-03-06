@@ -2,7 +2,6 @@
 
 train-images-idx3-ubyte.gz
 train-labels-idx1-ubyte.gz
-mnist-train-*
 img*.jpg
 img*.txt
 

@@ -1,3 +1,18 @@
+v0.8.1 (2016-03-06)
+===================
+- New classifiers with both SudokuExtract and MNIST data.
+- New data.
+- MNIST data stored separately from SUdokuExtract data.
+- Number of Nearest Neighbours increased to 10 due to larger training data.
+- Several small bugfixes for new features added in v0.8.0.
+
+v0.8.0 (2016-03-05)
+===================
+- New classifiers with MNIST data.
+- New multi-attempt approach to Sudoku parsing.
+- Using DLXSudoku to attempt classification of correct parsing of Sudoku.
+- Removed a lot of deprecated code.
+
 v0.7.0 (2016-02-26)
 ===================
 - Two different extraction methods:

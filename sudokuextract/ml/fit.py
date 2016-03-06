@@ -15,7 +15,6 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import sys
-import itertools
 from pkg_resources import resource_filename, resource_exists
 try:
     import cPickle as pickle

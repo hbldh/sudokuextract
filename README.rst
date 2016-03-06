@@ -70,9 +70,9 @@ predicting digits; see the documentation for more details.
 Testing
 -------
 
-Run tests with `nosetests <https://nose.readthedocs.org>`_::
+Run tests with `pytest <http://pytest.org/>`_::
 
-    $ nosetests tests.py
+    $ py.test tests.py
 
 
 Documentation
@@ -83,7 +83,8 @@ TBD.
 References
 ----------
 
-This library includes options to use the MNIST dataset.
+This library includes classifiers trained with data from the MNIST dataset
+(This data is also included in SudokuExtract).
 
 .. _1:
 

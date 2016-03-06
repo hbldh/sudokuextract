@@ -56,7 +56,7 @@ setup(
         'scikit-image>=0.11.3',
         'pillow>=3.1.0',
         'pyefd>=0.1.2',
-        'dlxsudoku>=0.10.0'
+        'dlxsudoku>=0.10.1'
     ],
     test_suite="tests",
     dependency_links=[],

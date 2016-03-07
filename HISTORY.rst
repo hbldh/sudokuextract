@@ -1,3 +1,7 @@
+v0.8.2 (2016-03-07)
+===================
+- Restricted scikit-image version to < 0.12.
+
 v0.8.1 (2016-03-06)
 ===================
 - New classifiers with both SudokuExtract and MNIST data.

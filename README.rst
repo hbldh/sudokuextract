@@ -19,7 +19,7 @@ Requirements
 
 * ``numpy>=1.9.2``
 * ``scipy>=0.15.1``
-* ``scikit-image>=0.11.3``
+* ``scikit-image<0.12.0``
 * ``Pillow>=3.1.0``
 * ``pyefd>=0.1.2``
 * ``dlxsudoku>=0.10.0``
@@ -83,7 +83,8 @@ TBD.
 References
 ----------
 
-This library includes classifiers trained with data from the MNIST dataset.
+This library includes classifiers trained with data from the MNIST dataset
+(This data is also included in SudokuExtract).
 
 .. _1:
 

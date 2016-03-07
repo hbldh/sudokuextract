@@ -4,3 +4,5 @@ source = sudokuextract
 include = */sudokuextract/*
 omit =
     */setup.py
+    sudokuextract/__init__.py
+    sudokuextract/data/__init__.py

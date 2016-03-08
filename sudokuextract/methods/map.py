@@ -29,7 +29,7 @@ from sudokuextract.utils import predictions_to_suduko_string
 def extraction_method_map(image, classifier, use_local_thresholding=False, apply_gaussian=False, n=5, force=False):
     for sudoku, subimage in _extraction_iterator_map(image, use_local_thresholding, apply_gaussian, n=n):
         try:
-            pred_n_imgs = classify_sudoku(sudoku, classifier, False)
+            pred_n_imgs = classify_sudoku(sudoku, classifier)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
             imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
 

@@ -30,7 +30,7 @@ def extraction_method_corners(image, classifier, use_local_thresholding=False, a
     for sudoku, subimage in _extraction_iterator_corners(
             image, use_local_thresholding, apply_gaussian=apply_gaussian, n=n):
         try:
-            pred_n_imgs = classify_sudoku(sudoku, classifier, False)
+            pred_n_imgs = classify_sudoku(sudoku, classifier)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
             imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
 

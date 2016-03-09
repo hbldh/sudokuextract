@@ -28,6 +28,7 @@ from PIL import Image
 from sudokuextract.methods.map import _extraction_iterator_map
 from sudokuextract.ml.features import extract_efd_features
 from sudokuextract.imgproc.blob import blobify
+from sudokuextract.utils import download_image
 
 _url_to_mnist_train_data = "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz"
 _url_to_mnist_train_labels = "http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz"
@@ -312,4 +313,19 @@ def _save_data(which, X, y, data_source):
         np.save(f, y)
 
 
+def fetch_all_xanadoku_images(folder_to_store_in, api_token):
+    import json
+    doc = json.loads(urlopen("https://xanadoku.herokuapp.com/getallsudokus/{0}".format(
+        api_token)).read().decode('utf8'))
+    for d in doc.get('sudokus'):
+        if not d.get('verified'):
+            continue
+        print("Saving {0}...".format(d.get('_id')))
+        img = download_image(d.get('raw_image_url'))
+        with open(os.path.join(os.path.abspath(os.path.expanduser(
+                folder_to_store_in)), d.get('_id') + '.jpg'), 'w') as f:
+            img.save(f)
+        with open(os.path.join(os.path.abspath(os.path.expanduser(
+                folder_to_store_in)), d.get('_id') + '.txt'), 'w') as f:
+            f.writelines([d.get('parsed_sudoku')[i:i+9] + '\n' for i in range(0, len(d.get('parsed_sudoku')), 9)])
 

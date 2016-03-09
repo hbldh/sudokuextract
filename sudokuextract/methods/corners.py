@@ -15,6 +15,8 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import numpy as np
+from skimage.transform import resize
+from skimage.filters import gaussian_filter
 
 from dlxsudoku.sudoku import Sudoku
 from dlxsudoku.exceptions import SudokuException
@@ -30,7 +32,7 @@ def extraction_method_corners(image, classifier, use_local_thresholding=False, a
     for sudoku, subimage in _extraction_iterator_corners(
             image, use_local_thresholding, apply_gaussian=apply_gaussian, n=n):
         try:
-            pred_n_imgs = classify_sudoku(sudoku, classifier, False)
+            pred_n_imgs = classify_sudoku(sudoku, classifier)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
             imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
 
@@ -51,10 +53,14 @@ def extraction_method_corners(image, classifier, use_local_thresholding=False, a
 
 
 def _extraction_iterator_corners(image, use_local_thresholding=False, apply_gaussian=False, n=5):
-    img = image.convert('L')
     # If the image is too small, then double its scale until big enough.
-    while max(img.size) < 500:
-        img = img.resize(np.array(img.size) * 2)
+    img = image
+    while max(img.shape) < 500:
+        img = resize(img, np.array(img.shape) * 2)
+
+    if apply_gaussian:
+        img = gaussian_filter(image, (3.0, 3.0))
+
     for corner_points in iter_blob_extremes(img, n=n):
         try:
             warped_image = geometry.warp_image_by_corner_points_projection(corner_points, img)

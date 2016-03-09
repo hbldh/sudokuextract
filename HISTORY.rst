@@ -1,3 +1,12 @@
+v0.8.3 (2016-03-09)
+===================
+- Disabled the Corners parsing solution again.
+- Warping image now creates a much smaller image to prevent memory issues.
+- This also increased speed with a factor of at least 4.
+- ``apply_gaussian`` now applies a Gaussian on entire image first.
+- Testing can now use a tar-file of images that can be downloaded from the web.
+- Also removed lambda functions in favour of ``functools.partial``.
+
 v0.8.2 (2016-03-07)
 ===================
 - Restricted scikit-image version to < 0.12.
@@ -6,7 +15,7 @@ v0.8.1 (2016-03-06)
 ===================
 - New classifiers with both SudokuExtract and MNIST data.
 - New data.
-- MNIST data stored separately from SUdokuExtract data.
+- MNIST data stored separately from SudokuExtract data.
 - Number of Nearest Neighbours increased to 10 due to larger training data.
 - Several small bugfixes for new features added in v0.8.0.
 

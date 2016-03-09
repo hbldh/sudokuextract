@@ -15,6 +15,7 @@ from __future__ import unicode_literals
 from __future__ import absolute_import
 
 import numpy as np
+from skimage.filters import gaussian_filter
 
 from dlxsudoku.sudoku import Sudoku
 from dlxsudoku.exceptions import SudokuException
@@ -29,13 +30,13 @@ from sudokuextract.utils import predictions_to_suduko_string
 def extraction_method_map(image, classifier, use_local_thresholding=False, apply_gaussian=False, n=5, force=False):
     for sudoku, subimage in _extraction_iterator_map(image, use_local_thresholding, apply_gaussian, n=n):
         try:
-            pred_n_imgs = classify_sudoku(sudoku, classifier, False)
+            pred_n_imgs = classify_sudoku(sudoku, classifier)
             preds = np.array([[pred_n_imgs[k][kk][0] for kk in range(9)] for k in range(9)])
             imgs = [[pred_n_imgs[k][kk][1] for kk in range(9)] for k in range(9)]
 
             if np.sum(preds > 0) >= 17 or force:
-                s = Sudoku(predictions_to_suduko_string(preds))
                 try:
+                    s = Sudoku(predictions_to_suduko_string(preds))
                     s.solve()
                 except SudokuException:
                     if force:
@@ -50,10 +51,12 @@ def extraction_method_map(image, classifier, use_local_thresholding=False, apply
 
 
 def _extraction_iterator_map(image, use_local_thresholding=False, apply_gaussian=False, n=5):
-    img = image.convert('L')
-    # If the image is too small, then double its scale until big enough.
-    while max(img.size) < 1000:
-        img = img.resize(np.array(img.size) * 2)
+
+    if apply_gaussian:
+        img = gaussian_filter(image, (3.0, 3.0))
+    else:
+        img = image
+
     for edges in iter_blob_contours(img, n=n):
         try:
             warped_image = geometry.warp_image_by_interp_borders(edges, img)

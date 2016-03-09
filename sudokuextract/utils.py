@@ -29,6 +29,14 @@ def load_image(image_path):
 
 
 def download_image(image_url):
+    """Downloads an image and reads it into a PIL Image.
+
+    :param image_url: An url to the file to download.
+    :type image_url: str
+    :return: PIL Image.
+    :rtype: :py:class:`PIL.Image.Image`
+
+    """
     return Image.open(BytesIO(urlopen(image_url).read()))
 
 

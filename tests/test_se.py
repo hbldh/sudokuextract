@@ -27,8 +27,8 @@ except ImportError:
 from PIL import Image
 
 from sudokuextract.extract import extract_sudoku, main
-from sudokuextract.utils import predictions_to_suduko_string, download_image
-from sudokuextract.ml.fit import get_default_sudokuextract_classifier
+from sudokuextract.utils import predictions_to_suduko_string, download_image, load_image
+from sudokuextract.ml import fit
 
 try:
     _range = xrange
@@ -52,7 +52,7 @@ def _get_parsed_img(nbr=1):
 
 @pytest.fixture(scope="module")
 def classifier():
-    return get_default_sudokuextract_classifier()
+    return fit.get_default_sudokuextract_classifier()
 
 
 def _process_an_image(image, correct_sudoku):
@@ -93,6 +93,24 @@ def test_image_2_cmd_2():
     assert parsed_sudoku == correct_sudoku
 
 
+def test_image_1_with_trained_classifier():
+    image = _get_img(1)
+    c = fit.KNeighborsClassifier(n_neighbors=5)
+    c = fit.fit_sudokuextract_classifier(c)
+    predictions, sudoku, subimage = extract_sudoku(image, c)
+    parsed_sudoku = predictions_to_suduko_string(predictions)
+    assert parsed_sudoku == _get_parsed_img(1)
+
+
+def test_image_2_with_trained_classifier():
+    image = _get_img(2)
+    c = fit.KNeighborsClassifier(n_neighbors=10)
+    c = fit.fit_combined_classifier(c)
+    predictions, sudoku, subimage = extract_sudoku(image, c)
+    parsed_sudoku = predictions_to_suduko_string(predictions)
+    assert parsed_sudoku == _get_parsed_img(2)
+
+
 def test_url_1_straight():
     url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
     image = download_image(url)
@@ -127,18 +145,6 @@ def test_url_1_via_commandline():
 ### Parameterized tests
 
 
-_, _, files = list(os.walk(os.path.dirname(__file__)))[0]
-n_test_files = sum([os.path.splitext(f)[1].lower() == '.jpg' for f in files]) + 1
-
-
-@pytest.mark.parametrize("nbr", _range(1, n_test_files))
-def test_images(nbr):
-    """Test the images located in this folder."""
-    image = _get_img(nbr)
-    correct_sudoku = _get_parsed_img(nbr)
-    _process_an_image(image, correct_sudoku)
-
-
 if os.environ.get('XANADOKU_API_TOKEN') is not None:
     import json
     _url = "https://xanadoku.herokuapp.com/getallsudokus/" + os.environ.get('XANADOKU_API_TOKEN')
@@ -164,3 +170,57 @@ def test_xanadoku_sudokus(sudoku_doc):
             parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=True)
         assert parsed_sudoku == sudoku_doc.get('parsed_sudoku')
 
+
+@pytest.yield_fixture(scope='module')
+def se_data_tar_files():
+    if os.environ.get("SUDOKUEXTRACT_TEST_DATA_URL") is not None:
+        import tarfile
+        import tempfile
+
+        temp_dir = tempfile.mkdtemp()
+        f = tarfile.open(fileobj=urlopen(os.environ.get("SUDOKUEXTRACT_TEST_DATA_URL")), mode='r|gz')
+        f.extractall(temp_dir)
+
+        pth, _, files = next(os.walk(temp_dir))
+        files = list(set([os.path.splitext(f)[0] for f in files]))
+        files = [os.path.join(pth, f) for f in files]
+
+        return files
+    elif os.environ.get("SUDOKUEXTRACT_TEST_DATA_PATH") is not None:
+        import tarfile
+        import tempfile
+
+        temp_dir = tempfile.mkdtemp()
+        f = tarfile.open(os.environ.get("SUDOKUEXTRACT_TEST_DATA_PATH"), 'r:gz')
+        f.extractall(temp_dir)
+        f.close()
+
+        pth, _, files = next(os.walk(temp_dir))
+        files = list(set([os.path.splitext(f)[0] for f in files]))
+        files = [os.path.join(pth, f) for f in files]
+
+        return files
+    else:
+        return []
+
+
+@pytest.mark.parametrize("file_path_base", se_data_tar_files())
+def test_se_tardata_sudokus(file_path_base):
+    image = load_image(file_path_base + '.jpg')
+    with open(file_path_base + '.txt', 'rt') as f:
+        correct_parsing = f.read().strip()
+
+    predictions, sudoku, subimage = extract_sudoku(image, classifier(), force=True)
+    parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=False)
+    if parsed_sudoku != correct_parsing:
+        predictions, sudoku, subimage = extract_sudoku(image.rotate(-90), classifier(), force=True)
+        parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=False)
+    assert parsed_sudoku == correct_parsing
+
+    os.remove(file_path_base + '.jpg')
+    os.remove(file_path_base + '.txt')
+    try:
+        print("Deleted temporary test dir.")
+        os.removedirs(os.path.dirname(file_path_base))
+    except:
+        pass

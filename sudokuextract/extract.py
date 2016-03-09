@@ -14,6 +14,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
+import numpy as np
+
 from sudokuextract.exceptions import SudokuExtractError
 from sudokuextract.utils import load_image, download_image, predictions_to_suduko_string
 from sudokuextract.ml.fit import get_default_sudokuextract_classifier
@@ -23,6 +25,8 @@ from sudokuextract.methods import extraction_method_map, extraction_methods
 def extract_sudoku(image, classifier=None, force=False):
     if classifier is None:
         classifier = get_default_sudokuextract_classifier()
+
+    image = np.array(image.convert('L'))
 
     for method_name, method in extraction_methods:
         try:

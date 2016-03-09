@@ -27,7 +27,7 @@ install:
   - "pip install pytest"
   - "pip install pytest-cov"
   - "pip install python-coveralls"
-  - "travis_wait pip install -r travis_subrequirements.txt"
+  - "travis_wait pip install numpy>1.10.3 scipy>0.16.2"
   - "pip install -r requirements.txt"
   - "pip install -e ."
 script: py.test tests/ --cov sudokuextract --cov-report term-missing

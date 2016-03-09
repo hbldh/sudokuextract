@@ -26,8 +26,8 @@ from scipy import ndimage as ndi
 from skimage.filters import gaussian_filter, threshold_adaptive
 from skimage.measure import label
 from skimage.measure import regionprops
-from skimage.transform import resize
 from skimage.morphology import binary_dilation
+from skimage.transform import resize
 
 from sudokuextract.exceptions import SudokuExtractError
 from sudokuextract.imgproc.binary import to_binary_otsu, add_border
@@ -35,8 +35,8 @@ from sudokuextract.imgproc.geometry import get_contours
 
 
 def iter_blob_contours(image, n=5):
-    original_shape = image.size
-    if max(image.size) < 2000:
+    original_shape = image.shape[::-1]
+    if max(original_shape) < 2000:
         size = (500, 500)
         y_scale = original_shape[0] / 500
         x_scale = original_shape[1] / 500
@@ -45,7 +45,7 @@ def iter_blob_contours(image, n=5):
         y_scale = original_shape[0] / 1000
         x_scale = original_shape[1] / 1000
 
-    img = np.array(image.resize(size))
+    img = resize(image, size)
     bimg = gaussian_filter(img, sigma=1.0)
     bimg = threshold_adaptive(bimg, 20, offset=2/255)
     bimg = -bimg
@@ -119,8 +119,8 @@ def iter_blob_contours(image, n=5):
 
 
 def iter_blob_extremes(image, n=5):
-    original_shape = image.size
-    if max(image.size) < 2000:
+    original_shape = image.shape[::-1]
+    if max(original_shape) < 2000:
         size = (500, 500)
         y_scale = original_shape[0] / 500
         x_scale = original_shape[1] / 500
@@ -129,7 +129,7 @@ def iter_blob_extremes(image, n=5):
         y_scale = original_shape[0] / 1000
         x_scale = original_shape[1] / 1000
 
-    img = np.array(image.resize(size))
+    img = resize(image, size)
     bimg = gaussian_filter(img, sigma=1.0)
     bimg = threshold_adaptive(bimg, 20, offset=2/255)
     bimg = -bimg

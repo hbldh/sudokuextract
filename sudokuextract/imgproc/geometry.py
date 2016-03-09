@@ -17,9 +17,9 @@ from __future__ import absolute_import
 from operator import attrgetter
 
 import numpy as np
-from skimage.morphology import binary_opening
+from skimage.morphology import binary_opening, binary_dilation
 from skimage.filters import gaussian_filter
-from skimage.transform import warp, ProjectiveTransform
+from skimage.transform import warp, ProjectiveTransform, resize
 from skimage.measure import find_contours
 
 from sudokuextract.imgproc.binary import to_binary_otsu, to_binary_adaptive
@@ -50,8 +50,10 @@ def warp_image_by_corner_points_projection(corner_points, image):
 
     tr = ProjectiveTransform()
     tr.estimate(dst, src)
+    warped_image = warp(image, tr, output_shape=(L, L))
+    out = resize(warped_image, (500, 500))
 
-    return warp(image, tr, output_shape=(L, L))
+    return out
 
 
 def warp_image_by_interp_borders(edges, image):
@@ -83,16 +85,16 @@ def warp_image_by_interp_borders(edges, image):
     d_right_edge = np.linalg.norm(right_edge[0, :] - right_edge[-1, :])
 
     d = int(np.ceil(max([d_top_edge, d_bottom_edge, d_left_edge, d_right_edge])))
-    return warp(image, _mapping_fcn, output_shape=(d, d))
+    return warp(image, _mapping_fcn, output_shape=(600, 600))
 
 
 def split_image_into_sudoku_pieces_adaptive_global(image, otsu_local=False, apply_gaussian=False):
     L = image.shape[0]
     d = int(np.ceil(L / 9))
-    dd = d // 6
+    dd = d // 5
     output = []
     if apply_gaussian:
-        image = gaussian_filter(image, sigma=10.0)
+        image = gaussian_filter(image, sigma=1.0)
     if not otsu_local:
         image = to_binary_adaptive(image)
     for k in range(9):
@@ -107,6 +109,8 @@ def split_image_into_sudoku_pieces_adaptive_global(image, otsu_local=False, appl
                 i = to_binary_otsu(i)
             i = binary_opening(i)
             i = to_binary_otsu(i)
+            if apply_gaussian:
+                i = to_binary_otsu(binary_dilation(i))
             this_row.append(i)
         output.append(this_row)
     return output, image

@@ -26,7 +26,7 @@ from scipy import ndimage as ndi
 from skimage.filters import gaussian_filter, threshold_adaptive
 from skimage.measure import label
 from skimage.measure import regionprops
-from skimage.morphology import binary_dilation
+from skimage.morphology import binary_dilation, binary_erosion
 from skimage.transform import resize
 
 from sudokuextract.exceptions import SudokuExtractError
@@ -48,8 +48,7 @@ def iter_blob_contours(image, n=5):
     img = resize(image, size)
     bimg = gaussian_filter(img, sigma=1.0)
     bimg = threshold_adaptive(bimg, 20, offset=2/255)
-    bimg = -bimg
-    bimg = ndi.binary_fill_holes(bimg)
+    bimg = (-binary_erosion(bimg))
     label_image = label(bimg, background=False)
     label_image += 1
 
@@ -198,7 +197,7 @@ def _get_most_centered_blob(image):
 
     for region in regionprops(label_image, i_img):
         # Test 1: If the region is too small to be interesting: skip it.
-        if region.area < (np.prod(image.shape) * 0.015):
+        if region.area < (np.prod(image.shape) * 0.010):
             continue
 
         # Test 2: If the region a white one: skip it.

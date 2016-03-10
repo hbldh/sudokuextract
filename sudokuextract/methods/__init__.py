@@ -3,7 +3,7 @@
 from functools import partial
 from .map import extraction_method_map
 
-N = 1
+N = 2
 
 extraction_methods = [
     ("Map, local", partial(extraction_method_map, use_local_thresholding=True, n=N)),

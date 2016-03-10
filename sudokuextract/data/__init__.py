@@ -162,7 +162,7 @@ def _mnist_labels():
     return data
 
 
-def create_data_set_from_images(path_to_data_dir):
+def create_data_set_from_images(path_to_data_dir, force=False):
 
     try:
         import matplotlib.pyplot as plt
@@ -183,40 +183,60 @@ def create_data_set_from_images(path_to_data_dir):
             image = Image.open(os.path.join(path_to_data_dir, f))
             with open(os.path.join(path_to_data_dir, "{0}.txt".format(file_name)), 'rt') as f:
                 parsed_img = f.read().strip().split('\n')
-            for sudoku, subimage in _extraction_iterator_map(image):
-                for k in range(len(sudoku)):
-                    for kk in range(len(sudoku[k])):
-                        ax = plt.subplot2grid((9, 9), (k, kk))
-                        ax.imshow(sudoku[k][kk], plt.cm.gray)
-                        ax.set_title(str(parsed_img[k][kk]))
-                        ax.axis('off')
-                plt.show()
-                ok = raw_input("Is this OK (y/N/a)? ")
-                if ok == 'y':
+            for sudoku, subimage in _extraction_iterator_map(np.array(image.convert('L'))):
+                if not force:
+                    for k in range(len(sudoku)):
+                        for kk in range(len(sudoku[k])):
+                            ax = plt.subplot2grid((9, 9), (k, kk))
+                            ax.imshow(sudoku[k][kk], plt.cm.gray)
+                            ax.set_title(str(parsed_img[k][kk]))
+                            ax.axis('off')
+                    plt.show()
+                    ok = raw_input("Is this OK (Y/n/a)? ")
+                    if ok.lower() == 'a':
+                        break
+                    elif ok.lower() == 'n':
+                        continue
+                    else:
+                        for k in range(len(sudoku)):
+                            for kk in range(len(sudoku[k])):
+                                images.append(sudoku[k][kk].copy())
+                                labels.append(int(parsed_img[k][kk]))
+                        break
+                else:
                     for k in range(len(sudoku)):
                         for kk in range(len(sudoku[k])):
                             images.append(sudoku[k][kk].copy())
                             labels.append(int(parsed_img[k][kk]))
                     break
-                if ok == 'a':
-                    break
-            for sudoku, subimage in _extraction_iterator_map(image, use_local_thresholding=True):
-                for k in range(len(sudoku)):
-                    for kk in range(len(sudoku[k])):
-                        ax = plt.subplot2grid((9, 9), (k, kk))
-                        ax.imshow(sudoku[k][kk], plt.cm.gray)
-                        ax.set_title(str(parsed_img[k][kk]))
-                        ax.axis('off')
-                plt.show()
-                ok = raw_input("Is this OK (y/N/a)? ")
-                if ok == 'y':
+
+            for sudoku, subimage in _extraction_iterator_map(np.array(image.convert('L')), use_local_thresholding=True):
+                if not force:
+                    for k in range(len(sudoku)):
+                        for kk in range(len(sudoku[k])):
+                            ax = plt.subplot2grid((9, 9), (k, kk))
+                            ax.imshow(sudoku[k][kk], plt.cm.gray)
+                            ax.set_title(str(parsed_img[k][kk]))
+                            ax.axis('off')
+                    plt.show()
+                    ok = raw_input("Is this OK (Y/n/a)? ")
+                    if ok.lower() == 'a':
+                        break
+                    elif ok.lower() == 'n':
+                        continue
+                    else:
+                        for k in range(len(sudoku)):
+                            for kk in range(len(sudoku[k])):
+                                images.append(sudoku[k][kk].copy())
+                                labels.append(int(parsed_img[k][kk]))
+                        break
+                else:
                     for k in range(len(sudoku)):
                         for kk in range(len(sudoku[k])):
                             images.append(sudoku[k][kk].copy())
                             labels.append(int(parsed_img[k][kk]))
                     break
-                if ok == 'a':
-                    break
+
 
     try:
         os.makedirs(os.path.expanduser('~/sudokuextract'))

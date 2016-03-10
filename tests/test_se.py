@@ -206,7 +206,12 @@ def se_data_tar_files():
 
 @pytest.mark.parametrize("file_path_base", se_data_tar_files())
 def test_se_tardata_sudokus(file_path_base):
-    image = load_image(file_path_base + '.jpg')
+    try:
+        image_file_name = file_path_base + '.jpg'
+        image = load_image(image_file_name)
+    except:
+        image_file_name = file_path_base + '.png'
+        image = load_image(image_file_name)
     with open(file_path_base + '.txt', 'rt') as f:
         correct_parsing = f.read().strip()
 
@@ -217,9 +222,10 @@ def test_se_tardata_sudokus(file_path_base):
         parsed_sudoku = predictions_to_suduko_string(predictions, oneliner=False)
     assert parsed_sudoku == correct_parsing
 
-    os.remove(file_path_base + '.jpg')
-    os.remove(file_path_base + '.txt')
+
     try:
+        os.remove(image_file_name)
+        os.remove(file_path_base + '.txt')
         print("Deleted temporary test dir.")
         os.removedirs(os.path.dirname(file_path_base))
     except:

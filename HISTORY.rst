@@ -1,3 +1,8 @@
+v0.8.4 (2016-03-10)
+===================
+- New classifiers.
+- New data with additional data of 1:s.
+
 v0.8.3 (2016-03-09)
 ===================
 - Disabled the Corners parsing solution again.

@@ -198,7 +198,7 @@ def _get_most_centered_blob(image):
 
     for region in regionprops(label_image, i_img):
         # Test 1: If the region is too small to be interesting: skip it.
-        if region.area < (np.prod(image.shape) * 0.015):
+        if region.area < (np.prod(image.shape) * 0.010):
             continue
 
         # Test 2: If the region a white one: skip it.

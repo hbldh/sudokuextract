@@ -1,3 +1,7 @@
+v0.8.5 (2016-03-10)
+===================
+- Replace ndi.binary_fill_holes with a binary_erosion and increased number of blobs to test to 2.
+
 v0.8.4 (2016-03-10)
 ===================
 - New classifiers.

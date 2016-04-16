@@ -1,3 +1,8 @@
+v0.8.6 (2016-04-16)
+===================
+- Changed the main function of `sudokuextract.extract` to print and
+  not return anything.
+
 v0.8.5 (2016-03-10)
 ===================
 - Replace ndi.binary_fill_holes with a binary_erosion and increased number of blobs to test to 2.

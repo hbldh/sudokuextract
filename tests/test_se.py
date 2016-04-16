@@ -61,36 +61,40 @@ def _process_an_image(image, correct_sudoku):
     assert parsed_sudoku == correct_sudoku
 
 
-def test_image_1_cmd_1():
+def test_image_1_cmd_1(capsys):
     """Test Image 1 via command line tool."""
     sys.argv = ['parse-sudoku', '-p', _get_img_path(1)]
-    parsed_sudoku = main()
+    main()
+    out, err = capsys.readouterr()
     correct_sudoku = _get_parsed_img(1)
-    assert parsed_sudoku == correct_sudoku
+    assert out.strip() == correct_sudoku
 
 
-def test_image_1_cmd_2():
+def test_image_1_cmd_2(capsys):
     """Test Image 1 via command line tool."""
     sys.argv = ['parse-sudoku', '-p', _get_img_path(1), '--oneliner']
-    parsed_sudoku = main()
+    main()
+    out, err = capsys.readouterr()
     correct_sudoku = _get_parsed_img(1).replace('\n', '')
-    assert parsed_sudoku == correct_sudoku
+    assert out.strip() == correct_sudoku
 
 
-def test_image_2_cmd_1():
+def test_image_2_cmd_1(capsys):
     """Test Image 1 via command line tool."""
     sys.argv = ['parse-sudoku', '-p', _get_img_path(2)]
-    parsed_sudoku = main()
+    main()
+    out, err = capsys.readouterr()
     correct_sudoku = _get_parsed_img(2)
-    assert parsed_sudoku == correct_sudoku
+    assert out.strip() == correct_sudoku
 
 
-def test_image_2_cmd_2():
+def test_image_2_cmd_2(capsys):
     """Test Image 2 via command line tool."""
     sys.argv = ['parse-sudoku', '-p', _get_img_path(2), '--oneliner']
-    parsed_sudoku = main()
+    main()
+    out, err = capsys.readouterr()
     correct_sudoku = _get_parsed_img(2).replace('\n', '')
-    assert parsed_sudoku == correct_sudoku
+    assert out.strip() == correct_sudoku
 
 
 def test_image_1_with_trained_classifier():
@@ -126,10 +130,11 @@ def test_url_1_straight():
     _process_an_image(image, solution)
 
 
-def test_url_1_via_commandline():
+def test_url_1_via_commandline(capsys):
     url = "https://static-secure.guim.co.uk/sys-images/Guardian/Pix/pictures/2013/2/27/1361977880123/Sudoku2437easy.jpg"
     sys.argv = ['parse-sudoku', '-u', url]
-    parsed_sudoku = main()
+    main()
+    out, err = capsys.readouterr()
     solution = ("041006029\n"
                 "300790000\n"
                 "009000308\n"
@@ -139,7 +144,7 @@ def test_url_1_via_commandline():
                 "403000900\n"
                 "000032004\n"
                 "650400730")
-    assert parsed_sudoku == solution
+    assert out.strip() == solution
 
 
 ### Parameterized tests

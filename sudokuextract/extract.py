@@ -62,9 +62,7 @@ def main():
 
     preds, images, subimage = extract_sudoku(image)
     sudoku_string = predictions_to_suduko_string(preds, args.oneliner)
-
     print(sudoku_string)
-    return sudoku_string
 
 if __name__ == '__main__':
     main()

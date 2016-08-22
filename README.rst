@@ -5,8 +5,6 @@ SudokuExtract
     :target: https://travis-ci.org/hbldh/sudokuextract
 .. image:: http://img.shields.io/pypi/v/sudokuextract.svg
     :target: https://pypi.python.org/pypi/sudokuextract/
-.. image:: http://img.shields.io/pypi/dm/sudokuextract.svg
-    :target: https://pypi.python.org/pypi/sudokuextract/
 .. image:: http://img.shields.io/pypi/l/sudokuextract.svg
     :target: https://pypi.python.org/pypi/sudokuextract/
 .. image:: https://coveralls.io/repos/github/hbldh/sudokuextract/badge.svg?branch=master

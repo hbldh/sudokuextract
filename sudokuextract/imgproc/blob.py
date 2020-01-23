@@ -48,7 +48,7 @@ def iter_blob_contours(image, n=5):
     img = resize(image, size)
     bimg = gaussian_filter(img, sigma=1.0)
     bimg = threshold_adaptive(bimg, 20, offset=2/255)
-    bimg = (-binary_erosion(bimg))
+    bimg = (~binary_erosion(bimg))
     label_image = label(bimg, background=False)
     label_image += 1
 

@@ -1,16 +1,15 @@
 SudokuExtract
 =============
 
-.. image:: https://travis-ci.org/hbldh/sudokuextract.svg?branch=master
-    :target: https://travis-ci.org/hbldh/sudokuextract
 .. image:: http://img.shields.io/pypi/v/sudokuextract.svg
     :target: https://pypi.python.org/pypi/sudokuextract/
-.. image:: http://img.shields.io/pypi/l/sudokuextract.svg
-    :target: https://pypi.python.org/pypi/sudokuextract/
-.. image:: https://coveralls.io/repos/github/hbldh/sudokuextract/badge.svg?branch=master
-    :target: https://coveralls.io/github/hbldh/sudokuextract?branch=master
+
 
 Library for extracting Sudokus from images using `scikit-image <http://scikit-image.org/>`_.
+
+
+
+**This package is, and will continue to be, unmaintained. It has been removed from PyPI, but will be available for installation from this archived repo instead.**
 
 Requirements
 ------------

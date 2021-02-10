@@ -1,13 +1,7 @@
 SudokuExtract
 =============
 
-.. image:: http://img.shields.io/pypi/v/sudokuextract.svg
-    :target: https://pypi.python.org/pypi/sudokuextract/
-
-
 Library for extracting Sudokus from images using `scikit-image <http://scikit-image.org/>`_.
-
-
 
 **This package is, and will continue to be, unmaintained. It has been removed from PyPI, but will be available for installation from this archived repo instead.**
 
